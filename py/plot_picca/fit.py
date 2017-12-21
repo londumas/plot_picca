@@ -4,6 +4,8 @@ import scipy.stats
 import copy
 import matplotlib.pyplot as plt
 import h5py
+import os.path
+
 from . import utils
 
 
@@ -28,6 +30,7 @@ class Fit:
     
     def read_fit_results(self,path,name):
     
+        path = os.path.expandvars(path)
         f = h5py.File(path,"r")
         
         ### Parameters
@@ -37,7 +40,10 @@ class Fit:
         lst_forFit = ["list of free pars","list of fixed pars","fval","ndata","npar","cov["]
         for el in list(f["best fit"].attrs):
             if any( ell in el for ell in lst_forFit):
-                self._fitAtrrs[str(el)]=f["best fit"].attrs[el]
+                if str(el)=="list of free pars" or str(el)=="list of fixed pars":
+                    self._fitAtrrs[str(el)]=[ ell.decode('UTF-8') for ell in f["best fit"].attrs[el]]
+                else:
+                    self._fitAtrrs[str(el)]=f["best fit"].attrs[el]
                 continue
             else:
                 tmp = {}
@@ -47,7 +53,7 @@ class Fit:
                 self._param[str(el)] = tmp
         
         ### Set errors to zero for unfitted param
-        for el in f["best fit"].attrs["list of fixed pars"]:
+        for el in self._fitAtrrs["list of fixed pars"]:
             self._param[el]["error"] = 0.
         
         ### Best fit
@@ -74,7 +80,7 @@ class Fit:
             to_print += " || "
         print(to_print)
         ###
-	to_print  = " || "
+        to_print  = " || "
         for p in lst:
             to_print += "".ljust(20)
             to_print += " || "
