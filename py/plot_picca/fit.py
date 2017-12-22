@@ -21,6 +21,7 @@ class Fit:
         if (dic is None):
             dic = copy.deepcopy(raw_dic_class)
     
+        self._name     = dic["name"]
         self._param    = None
         self._fitAtrrs = None
         self._da       = None
@@ -74,20 +75,22 @@ class Fit:
             lst = self._fitAtrrs["list of free pars"]
     
         ### 
-        to_print  = " || "
+        to_print0  = " || " + "".ljust(30) + " || "
+        to_print1  = " || " + "".ljust(30) + " || "
         for p in lst:
-            to_print += self._param[p]["name"].ljust(20)
-            to_print += " || "
-        print(to_print)
-        ###
-        to_print  = " || "
-        for p in lst:
-            to_print += "".ljust(20)
-            to_print += " || "
-        print(to_print)
+            to_print0 += self._param[p]["name"].ljust(20)
+            to_print0 += " || "
+            to_print1 += "".ljust(20)
+            to_print1 += " || "
+        to_print0 += "".ljust(30) + " || "
+        to_print1 += "".ljust(30) + " || "
+        print(to_print0)
+        print(to_print1)
         ###
         for c in list_corr:
-            to_print  = " || "
+
+            to_print  = " || " + c._name.ljust(30) + " || "
+
             for p in lst:
                 val = c._param[p]["value"]
                 err = c._param[p]["error"]
@@ -98,6 +101,16 @@ class Fit:
                 err = utils.format_number_with_precision(err,err)
                 to_print += (val + " +/- " + err).ljust(20)
                 to_print += " || "
+            
+            val = c._fitAtrrs["fval"]
+            err = 0.1
+            val = utils.format_number_with_precision(val,err)
+            nbBin   = str(c._fitAtrrs["ndata"])
+            nbParam = str(c._fitAtrrs["npar"])
+            proba = c._fitAtrrs["proba"]
+            proba = utils.format_number_with_precision(proba,proba)
+            s       = val + ' / (' + nbBin + '-' + nbParam + '),  p = ' + proba
+            to_print  += s.ljust(30) + " || "
             
             print(to_print)
     

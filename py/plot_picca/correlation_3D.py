@@ -272,6 +272,7 @@ class Correlation3D:
                 plt.errorbar(xxx,yyy,yerr=yer,linewidth=4,label=r'$'+el._title+'$')
 
         if (sliceX is not None):
+            plt.title(r"$0<r_{\perp}<4 \, [\mathrm{h^{-1}\,Mpc}]$",fontsize=30)
             plt.xlabel(r'$r_{\parallel} \, [\mathrm{h^{-1}\,Mpc}]$',fontsize=30)
         if (sliceY is not None):
             plt.xlabel(r'$r_{\perp} \, [\mathrm{h^{-1}\,Mpc}]$',fontsize=30)
