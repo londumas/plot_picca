@@ -5,13 +5,16 @@ import copy
 import matplotlib.pyplot as plt
 
 from . import utils
+from . import constants
 
 raw_dic_class = {
-    "correlation"             : "",
-    "f1"                      : "",
-    "f2"                      : "",
-    "path"                    : "",
-    "title"                   : "",
+    "correlation"             : None,
+    "f1"                      : None,
+    "f2"                      : None,
+    "lmin1"                   : None,
+    "lmin2"                   : None,
+    "path"                    : None,
+    "title"                   : None,
 }
 
 class Correlation1D:
@@ -25,8 +28,25 @@ class Correlation1D:
         self._correlation = dic['correlation']
         self._f1 = dic["f1"]
         self._f2 = dic["f2"]
+        self._lmin1 = dic["lmin1"]
+        self._lmin2 = dic["lmin2"]
         self._title = dic["title"]
 
+        ### List obsorber
+        self._listAbs1 = None
+        if not self._lmin1 is None:
+            self._listAbs1 = {}
+            for a, l in constants.absorber_IGM.items():
+                if l>self._lmin1:
+                    self._listAbs1[a] = l
+        self._listAbs2 = None
+        if not self._lmin2 is None:
+            self._listAbs2 = {}
+            for a, l in constants.absorber_IGM.items():
+                if l>self._lmin2:
+                    self._listAbs2[a] = l
+
+        ###
         self._llmin = None
         self._llmax = None
         self._dll   = None
@@ -64,18 +84,19 @@ class Correlation1D:
         self._cor = sp.zeros( (self._n1d,4) )
         self._cor[:,0] = 10.**( sp.arange(self._n1d)*self._dll )
 
-        inUp = False
+        inDown = False
         upperTri = sp.triu(self._mat["NB"])
         if (upperTri>0.).sum()==0:
-            inUp=True
+            inDown=True
+            self._cor[:,0] = self._cor[:,0][::-1]
 
         norm=1.
-        if sp.trace(self._mat["NB"],offset=0)>0:
+        if sp.trace(self._mat["NB"])>0:
             norm = sp.sum(sp.diag(self._mat["DA"],k=0)*sp.diag(self._mat["WE"],k=0))/sp.trace(self._mat["WE"],offset=0)
 
         for i in range(self._n1d):
             d = i
-            if inUp:
+            if inDown:
                 d = 1+i-self._n1d
             tda = sp.diag(self._mat["DA"],k=d)
             twe = sp.diag(self._mat["WE"],k=d)
@@ -103,15 +124,63 @@ class Correlation1D:
         plt.show()
 
         return
-    def plot_cor(self):
+    def plot_cor(self,other=[],lines=False,lineToShow=None):
 
-        x = self._cor[:,0]
-        y = self._cor[:,1]
-        w = (self._cor[:,2]>0.) & (self._cor[:,3]>10)
-        x = x[w]
-        y = y[w]
-        if x.size==0: return
-        plt.plot(x,y,linewidth=4)
+        lst_corr = [self] + other
+
+        ###
+        minY = None
+        maxY = None        
+        for c in lst_corr:
+            x = self._cor[:,0]
+            y = self._cor[:,1]
+            w = (self._cor[:,2]>0.) & (self._cor[:,3]>10)
+            x = x[w]
+            y = y[w]
+            if x.size==0: continue
+            plt.plot(x,y,linewidth=4)
+
+            if minY is None:
+                minY = y.min()
+            else:
+                minY = min(minY,y.min())
+            if maxY is None:
+                maxY = y.max()
+            else:
+                maxY = max(maxY,y.max())
+
+        for c in lst_corr:
+
+            x = self._cor[:,0]
+            y = self._cor[:,1]
+            w = (self._cor[:,2]>0.) & (self._cor[:,3]>10)
+            x = x[w]
+            y = y[w]
+            if x.size==0: continue
+
+            ### lines
+            if lines and c._listAbs1 is not None:
+
+                la1 = c._listAbs1
+                if c._listAbs2 is not None:
+                    la2 = c._listAbs2
+                else:
+                    la2 = c._listAbs1
+                
+                lst_lines = []
+                for a1,l1 in la1.items():
+                    for a2,l2 in la2.items():
+                        if (a1==a2) or (a1+"__"+a2 in lst_lines) or (a2+"__"+a1 in lst_lines):
+                            continue
+                        if (lineToShow is not None) and (a1 not in lineToShow) and (a2 not in lineToShow):
+                            continue
+                        q = l1/l2
+                        if q<x.min() or q>x.max(): q = 1./q
+                        if q<x.min() or q>x.max(): continue
+                        lst_lines += [a1+"__"+a2]
+                        plt.plot( [q,q], [minY,maxY], color="black")
+                        plt.text( q, 0.95*maxY, s=r"$\mathrm{"+a1+"\,-\,"+a2+"}$", rotation='vertical', fontsize=10)
+
         plt.xlabel(r'$\lambda_{1}/\lambda_{2}$',fontsize=30)
         plt.ylabel(r'$\mathrm{normalized} \, \xi^{ff,1D}(\lambda_{1},\lambda_{2})$',fontsize=30)
         plt.grid()
@@ -119,6 +188,22 @@ class Correlation1D:
 
         return
     def plot_mat(self):
+
+        ###
+        da = sp.copy(self._mat["DA"])
+        if sp.trace(da)!=0.:
+            da = utils.getCorrelationMatrix(da)
+        w = (self._mat["WE"]>0.) & (self._mat["NB"]>10)
+        da[ sp.logical_not(w) ] = sp.nan
+        
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        plt.imshow(da,origin="lower",interpolation='nearest')
+        cbar = plt.colorbar()
+        plt.grid(True)
+        cbar.formatter.set_powerlimits((0, 0))
+        cbar.update_ticks()
+        plt.show()
 
         ###
         for k in range(5):

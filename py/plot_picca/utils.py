@@ -54,14 +54,16 @@ def getCorrelationMatrix(cov):
     '''
 
     ### Get normalisation factor
-    invSqrtDiag = 1./sp.sqrt(sp.diag(cov))
+    invSqrtDiag = sp.zeros(sp.diag(cov).size)
+    w = (sp.diag(cov)>0.)
+    invSqrtDiag[w] = 1./sp.sqrt(sp.diag(cov)[w])
 
     ### Normalize
     cor = sp.array(cov)
     for i in range(cov[:,0].size):
         cor[:,i] *= invSqrtDiag[i]
         cor[i,:] *= invSqrtDiag[i]
-    cor[i,i] = 1.
+        if invSqrtDiag[i]>0.: cor[i,i] = 1.
 
     return cor
 def get_precision(error,nb_diggit=2):
