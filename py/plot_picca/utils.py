@@ -48,6 +48,22 @@ def convert1DTo2D(array1D,nbX,nbY):
         array2D[i][j] = array1D[k]
 
     return array2D
+def getCorrelationMatrix(cov):
+    '''
+        Get the correlation matrix from a covaraince matrix
+    '''
+
+    ### Get normalisation factor
+    invSqrtDiag = 1./sp.sqrt(sp.diag(cov))
+
+    ### Normalize
+    cor = sp.array(cov)
+    for i in range(cov[:,0].size):
+        cor[:,i] *= invSqrtDiag[i]
+        cor[i,:] *= invSqrtDiag[i]
+    cor[i,i] = 1.
+
+    return cor
 def get_precision(error,nb_diggit=2):
 
     precision = int( nb_diggit -1 -sp.floor( sp.log10(error) ) )

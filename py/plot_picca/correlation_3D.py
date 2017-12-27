@@ -282,7 +282,36 @@ class Correlation3D:
         plt.show()
 
         return
+    def plot_cov(self):
 
+        cov = self._co
+
+        if False:
+            ###
+            plt.plot(sp.diag(cov))
+            plt.grid()
+            plt.show()
+            ###
+            plt.plot(sp.diag(cov)*self._nb)
+            plt.grid()
+            plt.show()
+            ###
+            plt.plot(sp.diag(cov)*self._rt)
+            plt.grid()
+            plt.show()
+        if True:
+            cor = utils.getCorrelationMatrix(cov) 
+            ###
+            #plt.imshow(cor, interpolation='nearest')
+            #plt.show()
+            ###
+            for i in range(3): 
+                mcor = sp.asarray( [ sp.mean(sp.diag(cor,k=i+self._nt*k)) for k in sp.arange(self._np) ]  )
+                plt.plot(sp.arange(mcor.size)*self._binSize,mcor,linewidth=2)
+            plt.grid()
+            plt.show()
+
+        return
 
 
 
