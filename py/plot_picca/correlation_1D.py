@@ -209,7 +209,7 @@ class Correlation1D:
         for k in range(5):
             x = sp.arange(sp.diag(self._mat["DA"],k=k).size)
             y = sp.diag(self._mat["DA"],k=k)
-            w = (sp.diag(self._mat["WE"],k=k)>0.) & (sp.diag(self._mat["NB"],k=k)>=2.)
+            w = (sp.diag(self._mat["WE"],k=k)>0.) & (sp.diag(self._mat["NB"],k=k)>10.)
             x = x[w]
             y = y[w]
             plt.plot(x,y,linewidth=4,alpha=0.7)
