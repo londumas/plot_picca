@@ -14,8 +14,9 @@ raw_dic_class = {
     "o2"                      : "",
     "l1"                      : "",
     "l2"                      : "",
-    "path"                    : "",
+    "path"                    : None,
     "title"                   : "",
+    "nside"                   : None,
 }
 
 class Correlation3D:
@@ -34,6 +35,9 @@ class Correlation3D:
         self._l1 = dic["l1"]
         self._l2 = dic["l2"]
         self._title = dic["title"]
+        if "nside" not in dic.keys():
+            dic["nside"] = 16
+        self._nside = dic["nside"]
 
         ### bin size (only square)
         self._binSize = None
@@ -165,6 +169,16 @@ class Correlation3D:
         print("beta     = ",val)
 
         return
+    def is_valid(self):
+
+        valid = True
+        ### Covariance matrix
+        try:
+            sp.linalg.cholesky(self._co)
+        except:
+            return False
+
+        return valid
     def plot_2d(self,x_power=0):
 
         origin='lower'
@@ -239,13 +253,13 @@ class Correlation3D:
             plt.errorbar(xxx,coef*yyy,marker='o',label=r'$'+el._title+'$')
 
 
-        plt.xlabel(r'$r \, [\mathrm{h^{-1}\,Mpc}]$',fontsize=30)
+        plt.xlabel(r'$r \, [h^{-1} \, \mathrm{Mpc}]$',fontsize=30)
         if (x_power==0):
             plt.ylabel(r'$\xi$',fontsize=30)
         if (x_power==1):
-            plt.ylabel(r'$r \cdot \xi \, [\mathrm{h^{-1}\,Mpc}]$',fontsize=30)
+            plt.ylabel(r'$r \cdot \xi \, [h^{-1} \, \mathrm{Mpc}]$',fontsize=30)
         if (x_power==2):
-            plt.ylabel(r'$r^{2} \cdot \xi \, [(\mathrm{h^{-1}\,Mpc})^{2}]$',fontsize=30)
+            plt.ylabel(r'$r^{2} \cdot \xi \, [(h^{-1} \, \mathrm{Mpc})^{2}]$',fontsize=30)
         plt.legend(fontsize=20, numpoints=1,ncol=2, loc=1)
         plt.grid()
         plt.show()
@@ -272,10 +286,10 @@ class Correlation3D:
                 plt.errorbar(xxx,yyy,yerr=yer,linewidth=4,label=r'$'+el._title+'$')
 
         if (sliceX is not None):
-            plt.title(r"$0<r_{\perp}<4 \, [\mathrm{h^{-1}\,Mpc}]$",fontsize=30)
-            plt.xlabel(r'$r_{\parallel} \, [\mathrm{h^{-1}\,Mpc}]$',fontsize=30)
+            plt.title(r"$0<r_{\perp}<4 \, [h^{-1} \, \mathrm{Mpc}]$",fontsize=30)
+            plt.xlabel(r'$r_{\parallel} \, [h^{-1} \, \mathrm{Mpc}]$',fontsize=30)
         if (sliceY is not None):
-            plt.xlabel(r'$r_{\perp} \, [\mathrm{h^{-1}\,Mpc}]$',fontsize=30)
+            plt.xlabel(r'$r_{\perp} \, [h^{-1} \, \mathrm{Mpc}]$',fontsize=30)
         plt.ylabel(r'$\xi$',fontsize=30)
         plt.legend(fontsize=20, numpoints=1,ncol=2, loc=1)
         plt.grid()
@@ -305,10 +319,34 @@ class Correlation3D:
             #plt.imshow(cor, interpolation='nearest')
             #plt.show()
             ###
+            yMin = None
+            yMax = None
             for i in range(3): 
                 mcor = sp.asarray( [ sp.mean(sp.diag(cor,k=i+self._nt*k)) for k in sp.arange(self._np) ]  )
-                plt.plot(sp.arange(mcor.size)*self._binSize,mcor,linewidth=2)
+                plt.plot(sp.arange(mcor.size)*self._binSize,mcor,linewidth=2,label=r"$\Delta r_{\perp} = "+str(int(i*self._binSize))+"$")
+
+                if yMin is None:
+                    yMin = mcor.min()
+                else:
+                    yMin = min(yMin,mcor.min())
+                if yMax is None:
+                    if i==0:
+                        yMax = mcor[1:].max()
+                    else:
+                        yMax = mcor.max()
+                else:
+                    if i==0:
+                        yMax = max(yMax,mcor[1:].max())
+                    else:
+                        yMax = max(yMax,mcor.max())
+            plt.ylim([yMin,yMax])
+            plt.xlabel(r"$\Delta r_{\parallel} \, [h^{-1} \, \mathrm{Mpc}]$",fontsize=20)
+            plt.ylabel(r"$\overline{Corr}(\Delta r_{\parallel},\Delta r_{\perp})$",fontsize=20)
+            plt.legend(fontsize=20, numpoints=1,ncol=2, loc=1)
             plt.grid()
+            plt.tight_layout()
+            #plt.savefig(self._title)
+            #plt.clf()
             plt.show()
 
         return

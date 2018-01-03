@@ -109,22 +109,30 @@ class Correlation1D:
         vac.close()
     
         return
-    def plot_var(self):
+    def plot_var(self,other=[],redshiftLine=None):
 
-        x = self._var[:,0]
-        y = self._var[:,1]
-        w = (self._var[:,2]>0.) & (self._var[:,3]>10)
-        x = x[w]
-        y = y[w]
-        if x.size==0: return
-        plt.plot(x,y,linewidth=4)
-        plt.xlabel(r'$\lambda_{\mathrm{Obs.}} \, \mathrm{\AA{}}$',fontsize=30)
+        lst_corr = [self] + other
+        for c in lst_corr:
+            x = c._var[:,0]
+            y = c._var[:,1]
+            w = (c._var[:,2]>0.) & (c._var[:,3]>10)
+            x = x[w]
+            y = y[w]
+            if x.size==0: continue
+            if not redshiftLine is None:
+                x = x/redshiftLine-1.
+            plt.plot(x,y,linewidth=4)
+
+        if not redshiftLine is None:
+            plt.xlabel(r'$z$',fontsize=30)
+        else:
+            plt.xlabel(r'$\lambda_{\mathrm{Obs.}} \, \mathrm{\AA{}}$',fontsize=30)
         plt.ylabel(r'$\xi^{ff,1D}$',fontsize=30)
         plt.grid()
         plt.show()
 
         return
-    def plot_cor(self,other=[],lines=False,lineToShow=None):
+    def plot_cor(self,other=[],lines=False,lineToShow=None,redshiftLine=None):
 
         lst_corr = [self] + other
 
@@ -132,12 +140,14 @@ class Correlation1D:
         minY = None
         maxY = None        
         for c in lst_corr:
-            x = self._cor[:,0]
-            y = self._cor[:,1]
-            w = (self._cor[:,2]>0.) & (self._cor[:,3]>10)
+            x = c._cor[:,0]
+            y = c._cor[:,1]
+            w = (c._cor[:,2]>0.) & (c._cor[:,3]>10)
             x = x[w]
             y = y[w]
             if x.size==0: continue
+            if not redshiftLine is None:
+                x = utils.dist_lines_Obs(lObs1=redshiftLine[0],lObs2=redshiftLine[0]/x,lRF=redshiftLine[1])
             plt.plot(x,y,linewidth=4)
 
             if minY is None:
@@ -151,9 +161,9 @@ class Correlation1D:
 
         for c in lst_corr:
 
-            x = self._cor[:,0]
-            y = self._cor[:,1]
-            w = (self._cor[:,2]>0.) & (self._cor[:,3]>10)
+            x = c._cor[:,0]
+            y = c._cor[:,1]
+            w = (c._cor[:,2]>0.) & (c._cor[:,3]>10)
             x = x[w]
             y = y[w]
             if x.size==0: continue
@@ -178,12 +188,20 @@ class Correlation1D:
                         if q<x.min() or q>x.max(): q = 1./q
                         if q<x.min() or q>x.max(): continue
                         lst_lines += [a1+"__"+a2]
+                        if not redshiftLine is None:
+                            q = utils.dist_lines_Obs(lObs1=redshiftLine[0],lObs2=redshiftLine[0]/q,lRF=redshiftLine[1])
                         plt.plot( [q,q], [minY,maxY], color="black")
-                        plt.text( q, 0.95*maxY, s=r"$\mathrm{"+a1+"\,-\,"+a2+"}$", rotation='vertical', fontsize=10)
+                        plt.text( q, 0.95*maxY, s=r"$\mathrm{"+a1+"\,-\,"+a2+"}$", rotation='vertical', fontsize=15)
 
-        plt.xlabel(r'$\lambda_{1}/\lambda_{2}$',fontsize=30)
+        if not redshiftLine is None:
+            plt.xlabel(r'$\Delta r_{\parallel} \, [\mathrm{Mpc \, h^{-1}}]$',fontsize=30)
+        else:
+            plt.xlabel(r'$\lambda_{1}/\lambda_{2}$',fontsize=30)
         plt.ylabel(r'$\mathrm{normalized} \, \xi^{ff,1D}(\lambda_{1},\lambda_{2})$',fontsize=30)
         plt.grid()
+        plt.tight_layout()
+        #plt.savefig("fig.png")
+        #plt.clf()
         plt.show()
 
         return

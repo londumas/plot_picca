@@ -1,4 +1,7 @@
 import scipy as sp
+import scipy.constants
+from . import constants
+
 
 def croom(x):
     '''
@@ -100,3 +103,30 @@ def format_number_with_precision(number,error,number_of_digit=2):
     string = str(string).ljust(digit[0]-digit[1]+1+precision,'0')
 
     return string
+def dist_lines_Obs(lObs1,lObs2,lRF):
+    
+    z1 = lObs1/lRF-1.
+    z2 = lObs2/lRF-1.
+    z  = (z1+z2)/2.
+    dz = z1-z2
+
+    c = scipy.constants.speed_of_light/1000.
+    hz = 100*sp.sqrt( constants.omegaM0*(1.+z)**3 + (1.-constants.omegaM0) )
+    deltaRP = c*dz/hz
+
+    return deltaRP
+def dist_lines_RF(lRF1,lRF2,lObs):
+
+    z1 = lObs/lRF1-1.
+    z2 = lObs/lRF2-1.
+    z  = (z1+z2)/2.
+    dz = z1-z2
+
+    c = scipy.constants.speed_of_light/1000.
+    hz = 100.*sp.sqrt( constants.omegaM0*(1.+z)**3 + (1.-constants.omegaM0) )
+    deltaRP = c*dz/hz
+
+    return deltaRP
+
+
+
