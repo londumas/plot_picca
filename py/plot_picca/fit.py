@@ -67,52 +67,49 @@ class Fit:
         f.close()
     
         return
-    def print_fitted_par(self,other=[],lst=None,coeffBias=1.):
-
-        list_corr = [self] + other
+    def print_fitted_par(self,lst=None,coeffBias=1.,header=True):
     
         if lst is None:
             lst = self._fitAtrrs["list of free pars"]
     
-        ### 
-        to_print0  = " || " + "".ljust(30) + " || "
-        to_print1  = " || " + "".ljust(30) + " || "
-        for p in lst:
-            to_print0 += self._param[p]["name"].ljust(20)
-            to_print0 += " || "
-            to_print1 += "".ljust(20)
-            to_print1 += " || "
-        to_print0 += "".ljust(30) + " || "
-        to_print1 += "".ljust(30) + " || "
-        print(to_print0)
-        print(to_print1)
-        ###
-        for c in list_corr:
-
-            to_print  = " || " + c._name.ljust(30) + " || "
-
+        if header:
+            ### 
+            to_print0  = " || " + "".ljust(30) + " || "
+            to_print1  = " || " + "".ljust(30) + " || "
             for p in lst:
-                val = c._param[p]["value"]
-                err = c._param[p]["error"]
-                if len(p)>len("bias") and p[:4]=="bias":
-                    val *= coeffBias
-                    err *= coeffBias
-                val = utils.format_number_with_precision(val,err)
-                err = utils.format_number_with_precision(err,err)
-                to_print += (val + " +/- " + err).ljust(20)
-                to_print += " || "
-            
-            val = c._fitAtrrs["fval"]
-            err = 0.1
+                to_print0 += self._param[p]["name"].ljust(20)
+                to_print0 += " || "
+                to_print1 += "".ljust(20)
+                to_print1 += " || "
+            to_print0 += "".ljust(30) + " || "
+            to_print1 += "".ljust(30) + " || "
+            print(to_print0)
+            print(to_print1)
+        ###
+        to_print  = " || " + self._name.ljust(30) + " || "
+
+        for p in lst:
+            val = self._param[p]["value"]
+            err = self._param[p]["error"]
+            if len(p)>len("bias") and p[:4]=="bias":
+                val *= coeffBias
+                err *= coeffBias
             val = utils.format_number_with_precision(val,err)
-            nbBin   = str(c._fitAtrrs["ndata"])
-            nbParam = str(c._fitAtrrs["npar"])
-            proba = c._fitAtrrs["proba"]
-            proba = utils.format_number_with_precision(proba,proba)
-            s       = val + ' / (' + nbBin + '-' + nbParam + '),  p = ' + proba
-            to_print  += s.ljust(30) + " || "
+            err = utils.format_number_with_precision(err,err)
+            to_print += (val + " +/- " + err).ljust(20)
+            to_print += " || "
             
-            print(to_print)
+        val = self._fitAtrrs["fval"]
+        err = 0.1
+        val = utils.format_number_with_precision(val,err)
+        nbBin   = str(self._fitAtrrs["ndata"])
+        nbParam = str(self._fitAtrrs["npar"])
+        proba = self._fitAtrrs["proba"]
+        proba = utils.format_number_with_precision(proba,proba)
+        s       = val + ' / (' + nbBin + '-' + nbParam + '),  p = ' + proba
+        to_print  += s.ljust(30) + " || "
+            
+        print(to_print)
     
         return
 
