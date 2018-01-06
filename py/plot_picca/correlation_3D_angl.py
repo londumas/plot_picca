@@ -114,8 +114,8 @@ class Correlation3D_angl:
         self._rt_max = head['RTMAX']
         self._rp_min = head['RPMIN']
         self._rp_max = head['RPMAX']
-        self._binSizeP = (self._rp_max-self._rp_min]) / self._np
-        self._binSizeT = (self._rt_max-self._rt_min]) / self._nt
+        self._binSizeP = (self._rp_max-self._rp_min) / self._np
+        self._binSizeT = (self._rt_max-self._rt_min) / self._nt
         
         self._rp = vac[1]['RP'][:]
         self._rt = vac[1]['RT'][:]

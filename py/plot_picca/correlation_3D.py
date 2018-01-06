@@ -107,8 +107,8 @@ class Correlation3D:
         self._rt_max = head['RTMAX']
         self._rp_min = head['RPMIN']
         self._rp_max = head['RPMAX']
-        self._binSizeP = (self._rp_max-self._rp_min]) / self._np
-        self._binSizeT = (self._rt_max-self._rt_min]) / self._nt
+        self._binSizeP = (self._rp_max-self._rp_min) / self._np
+        self._binSizeT = (self._rt_max-self._rt_min) / self._nt
         if self._binSizeP==self._binSizeT:
             self._binSize = self._binSizeP
         else:
