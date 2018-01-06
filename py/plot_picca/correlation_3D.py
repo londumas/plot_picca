@@ -105,11 +105,15 @@ class Correlation3D:
         self._np = head['NP']
         self._rt_min = 0.
         self._rt_max = head['RTMAX']
-        try:
-            self._rp_min = head['RPMIN']
-        except:
-            self._rp_min = -head['RPMAX']
+        self._rp_min = head['RPMIN']
         self._rp_max = head['RPMAX']
+        self._binSizeP = (self._rp_max-self._rp_min]) / self._np
+        self._binSizeT = (self._rt_max-self._rt_min]) / self._nt
+        if self._binSizeP==self._binSizeT:
+            self._binSize = self._binSizeP
+        else:
+            print("binSizeP!=binSizeT")
+        
         self._rp = vac[1]['RP'][:]
         self._rt = vac[1]['RT'][:]
         self._r = sp.sqrt(self._rp**2. + self._rt**2.)
@@ -180,6 +184,10 @@ class Correlation3D:
 
         return valid
     def plot_2d(self,x_power=0):
+    
+        if ((self._we>0.).sum()==0):
+            print("no data")
+            return
 
         origin='lower'
         extent=[self._rt_min, self._rt_max, self._rp_min, self._rp_max]
@@ -187,15 +195,12 @@ class Correlation3D:
             origin='upper'
             extent=[self._rt_min, self._rt_max, self._rp_max, self._rp_min]
     
-
+        yyy = self._da
+        w = (self._we>0.) & (self._nb>10.)
+        yyy[sp.logical_not(w)] = float('nan')
         xxx = utils.convert1DTo2D(self._r,self._np,self._nt)
-        yyy = utils.convert1DTo2D(self._da,self._np,self._nt)
-        wee = utils.convert1DTo2D(self._we,self._np,self._nt)
-    
-        cut = (wee<=0.)
-        if (xxx[cut].size==xxx.size):
-            return
-        yyy[ cut ] = float('nan')
+        yyy = utils.convert1DTo2D(yyy,self._np,self._nt)
+        
         coef = sp.power(xxx,x_power)
     
         fig = plt.figure()
