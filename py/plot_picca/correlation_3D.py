@@ -195,7 +195,7 @@ class Correlation3D:
             origin='upper'
             extent=[self._rt_min, self._rt_max, self._rp_max, self._rp_min]
     
-        yyy = self._da
+        yyy = sp.copy(self._da)
         w = (self._we>0.) & (self._nb>10.)
         yyy[sp.logical_not(w)] = float('nan')
         xxx = utils.convert1DTo2D(self._r,self._np,self._nt)
@@ -276,10 +276,10 @@ class Correlation3D:
 
         for el in list_corr:
             if (sliceX is not None):
-                cut = (el._rt>el._binSize*sliceX) & (el._rt<el._binSize*(sliceX+1))
+                cut = (el._rt>el._rt_min+el._binSizeT*sliceX) & (el._rt<el._rt_min+el._binSizeT*(sliceX+1))
                 xxx = el._rp[cut]
             if (sliceY is not None):
-                cut = (el._rp>el._binSize*sliceY) & (el._rp<el._binSize*(sliceY+1))
+                cut = (el._rp>el._rp_min+el._binSizeP*sliceY) & (el._rp<el._rp_min+el._binSizeP*(sliceY+1))
                 xxx = el._rt[cut]
             yyy = el._da[cut]
             if not el._er is None:
