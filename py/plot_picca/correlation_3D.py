@@ -276,10 +276,10 @@ class Correlation3D:
 
         for el in list_corr:
             if (sliceX is not None):
-                cut = (el._rt>el._rt_min+el._binSizeT*sliceX) & (el._rt<el._rt_min+el._binSizeT*(sliceX+1))
+                cut = (el._rt>=el._rt_min+el._binSizeT*sliceX) & (el._rt<el._rt_min+el._binSizeT*(sliceX+1))
                 xxx = el._rp[cut]
             if (sliceY is not None):
-                cut = (el._rp>el._rp_min+el._binSizeP*sliceY) & (el._rp<el._rp_min+el._binSizeP*(sliceY+1))
+                cut = (el._rp>=el._rp_min+el._binSizeP*sliceY) & (el._rp<el._rp_min+el._binSizeP*(sliceY+1))
                 xxx = el._rt[cut]
             yyy = el._da[cut]
             if not el._er is None:
@@ -291,9 +291,14 @@ class Correlation3D:
                 plt.errorbar(xxx,yyy,yerr=yer,linewidth=4,label=r'$'+el._title+'$')
 
         if (sliceX is not None):
-            plt.title(r"$0<r_{\perp}<4 \, [h^{-1} \, \mathrm{Mpc}]$",fontsize=30)
+            minX = el._rt_min+el._binSizeT*sliceX
+            maxX = el._rt_min+el._binSizeT*(sliceX+1)
+            plt.title(r"$"+str(minY)+" < r_{\perp} < "+str(maxY)+"$",fontsize=30)
             plt.xlabel(r'$r_{\parallel} \, [h^{-1} \, \mathrm{Mpc}]$',fontsize=30)
         if (sliceY is not None):
+            minY = el._rp_min+el._binSizeP*sliceY
+            maxY = el._rp_min+el._binSizeP*(sliceY+1)
+            plt.title(r"$"+str(minY)+" < r_{\parallel} < "+str(maxY)+"$",fontsize=30)
             plt.xlabel(r'$r_{\perp} \, [h^{-1} \, \mathrm{Mpc}]$',fontsize=30)
         plt.ylabel(r'$\xi$',fontsize=30)
         plt.legend(fontsize=20, numpoints=1,ncol=2, loc=1)

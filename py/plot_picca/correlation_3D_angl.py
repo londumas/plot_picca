@@ -176,29 +176,36 @@ class Correlation3D_angl:
 
         return
     def plot_slice_2d(self,sliceX=None,sliceY=None, other=[]):
-
+    
+        crt = 1./scipy.constants.degree
         list_corr = [self] + other
 
         for el in list_corr:
             if (sliceX is not None):
-                cut = (el._rt>el._rt_min+el._binSizeT*sliceX) & (el._rt<el._rt_min+el._binSizeT*(sliceX+1))
+                cut = (el._rt>=el._rt_min+el._binSizeT*sliceX) & (el._rt<el._rt_min+el._binSizeT*(sliceX+1))
                 xxx = el._rp[cut]
             if (sliceY is not None):
-                cut = (el._rp>el._rp_min+el._binSizeP*sliceY) & (el._rp<el._rp_min+el._binSizeP*(sliceY+1))
-                xxx = el._rt[cut]
+                cut = (el._rp>=el._rp_min+el._binSizeP*sliceY) & (el._rp<el._rp_min+el._binSizeP*(sliceY+1))
+                xxx = crt*el._rt[cut]
             yyy = el._da[cut]
             if not el._er is None:
                 yer = el._er[cut]
-                
+
             if el._er is None:
                 plt.errorbar(xxx,yyy,linewidth=4,label=r'$'+el._title+'$')
             else:
                 plt.errorbar(xxx,yyy,yerr=yer,linewidth=4,label=r'$'+el._title+'$')
 
         if (sliceX is not None):
+            minX = el._rt_min+el._binSizeT*sliceX
+            maxX = el._rt_min+el._binSizeT*(sliceX+1)
+            plt.title(r"$"+str(minY)+" < \theta < "+str(maxY)+"$",fontsize=30)
             plt.xlabel(r'$\lambda_{1}/\lambda_{2}$',fontsize=30)
         if (sliceY is not None):
-            plt.xlabel(r'$\theta \, [\mathrm{rad}]$',fontsize=30)
+            minY = el._rp_min+el._binSizeP*sliceY
+            maxY = el._rp_min+el._binSizeP*(sliceY+1)
+            plt.title(r"$"+str(minY)+" < \lambda_{1}/\lambda_{2} < "+str(maxY)+"$",fontsize=30)
+            plt.xlabel(r'$\theta \, [\mathrm{deg}]$',fontsize=30)
         plt.ylabel(r'$\xi$',fontsize=30)
         plt.legend(fontsize=20, numpoints=1,ncol=2, loc=1)
         plt.grid()
