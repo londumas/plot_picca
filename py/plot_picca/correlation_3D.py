@@ -293,7 +293,7 @@ class Correlation3D:
         if (sliceX is not None):
             minX = el._rt_min+el._binSizeT*sliceX
             maxX = el._rt_min+el._binSizeT*(sliceX+1)
-            plt.title(r"$"+str(minY)+" < r_{\perp} < "+str(maxY)+"$",fontsize=30)
+            plt.title(r"$"+str(minX)+" < r_{\perp} < "+str(maxX)+"$",fontsize=30)
             plt.xlabel(r'$r_{\parallel} \, [h^{-1} \, \mathrm{Mpc}]$',fontsize=30)
         if (sliceY is not None):
             minY = el._rp_min+el._binSizeP*sliceY

@@ -182,11 +182,15 @@ class Correlation3D_angl:
 
         for el in list_corr:
             if (sliceX is not None):
-                cut = (el._rt>=el._rt_min+el._binSizeT*sliceX) & (el._rt<el._rt_min+el._binSizeT*(sliceX+1))
-                xxx = el._rp[cut]
+                cut  = (el._rt>=el._rt_min+el._binSizeT*sliceX) & (el._rt<el._rt_min+el._binSizeT*(sliceX+1))
+                cut &= (el._we>0.)
+                cut &= (el._nb>10)
+                xxx  = el._rp[cut]
             if (sliceY is not None):
-                cut = (el._rp>=el._rp_min+el._binSizeP*sliceY) & (el._rp<el._rp_min+el._binSizeP*(sliceY+1))
-                xxx = crt*el._rt[cut]
+                cut  = (el._rp>=el._rp_min+el._binSizeP*sliceY) & (el._rp<el._rp_min+el._binSizeP*(sliceY+1))
+                cut &= (el._we>0.)
+                cut &= (el._nb>10)
+                xxx  = crt*el._rt[cut]
             yyy = el._da[cut]
             if not el._er is None:
                 yer = el._er[cut]
@@ -199,7 +203,7 @@ class Correlation3D_angl:
         if (sliceX is not None):
             minX = el._rt_min+el._binSizeT*sliceX
             maxX = el._rt_min+el._binSizeT*(sliceX+1)
-            plt.title(r"$"+str(minY)+" < \theta < "+str(maxY)+"$",fontsize=30)
+            plt.title(r"$"+str(minX)+" < \theta < "+str(maxX)+"$",fontsize=30)
             plt.xlabel(r'$\lambda_{1}/\lambda_{2}$',fontsize=30)
         if (sliceY is not None):
             minY = el._rp_min+el._binSizeP*sliceY
