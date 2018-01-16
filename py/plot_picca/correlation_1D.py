@@ -148,7 +148,10 @@ class Correlation1D:
             if x.size==0: continue
             if not redshiftLine is None:
                 x = utils.dist_lines_Obs(lObs1=redshiftLine[0],lObs2=redshiftLine[0]/x,lRF=redshiftLine[1])
-            plt.plot(x,y,linewidth=4)
+            if c._title is not None:
+                plt.plot(x,y,linewidth=4,label=r"$"+c._title+"$")
+            else:
+                plt.plot(x,y,linewidth=4)
 
             if minY is None:
                 minY = y.min()
@@ -197,7 +200,8 @@ class Correlation1D:
             plt.xlabel(r'$\Delta r_{\parallel} \, [\mathrm{Mpc \, h^{-1}}]$',fontsize=30)
         else:
             plt.xlabel(r'$\lambda_{1}/\lambda_{2}$',fontsize=30)
-        plt.ylabel(r'$\mathrm{normalized} \, \xi^{ff,1D}(\lambda_{1},\lambda_{2})$',fontsize=30)
+        plt.ylabel(r'$\xi^{ff,1D}(\lambda_{1},\lambda_{2}) \, [\mathrm{normed}]$',fontsize=30)
+        plt.legend(fontsize=20, numpoints=1,ncol=2, loc=1)
         plt.grid()
         plt.tight_layout()
         #plt.savefig("fig.png")
