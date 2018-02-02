@@ -5,6 +5,7 @@ import copy
 import matplotlib.pyplot as plt
 
 from . import utils
+from picca import wedgize
 
 raw_dic_class = {
     "correlation"             : "",
@@ -35,6 +36,11 @@ class Correlation3D:
         self._l1 = dic["l1"]
         self._l2 = dic["l2"]
         self._title = dic["title"]
+        if "isfit" in list(dic.keys()) and dic["isfit"]:
+            self._isfit = True
+        else:
+            self._isfit = False
+        
         if "nside" not in dic.keys():
             dic["nside"] = 16
         self._nside = dic["nside"]
@@ -250,9 +256,12 @@ class Correlation3D:
                 xxx[i] += sp.sum(wer[cut])
                 yyy[i] += sp.sum(weda[cut])
                 wee[i] += sp.sum(we[cut])
-            cut = (wee>0.)
+            cut = wee>0.
             xxx[cut] /= wee[cut]
             yyy[cut] /= wee[cut]
+            cut = xxx<min(el._rp_max,el._rt_max)
+            xxx = xxx[cut]
+            yyy = yyy[cut]
 
             coef = sp.power(xxx,x_power)
             plt.errorbar(xxx,coef*yyy,marker='o',label=r'$'+el._title+'$')
@@ -274,7 +283,7 @@ class Correlation3D:
 
         list_corr = [self] + other
 
-        for el in list_corr:
+        for i,el in enumerate(list_corr):
             if (sliceX is not None):
                 cut = (el._rt>=el._rt_min+el._binSizeT*sliceX) & (el._rt<el._rt_min+el._binSizeT*(sliceX+1))
                 xxx = el._rp[cut]
@@ -300,11 +309,49 @@ class Correlation3D:
             maxY = el._rp_min+el._binSizeP*(sliceY+1)
             plt.title(r"$"+str(minY)+" < r_{\parallel} < "+str(maxY)+"$",fontsize=30)
             plt.xlabel(r'$r_{\perp} \, [h^{-1} \, \mathrm{Mpc}]$',fontsize=30)
-        plt.ylabel(r'$\xi$',fontsize=30)
-        plt.legend(fontsize=20, numpoints=1,ncol=2, loc=1)
+        plt.ylabel(r'$\xi(r_{\parallel},r_{\perp})$',fontsize=30)
+        plt.legend(fontsize=30, numpoints=1,ncol=2, loc=1)
         plt.grid()
         plt.show()
 
+        return
+    def plot_wedge(self,x_power=0,mumin=-1.,mumax=1., other=[]):
+    
+        list_corr = [self] + other
+        
+        for i,c in enumerate(list_corr):
+            rpmin = c._rp_min
+            rpmax = c._rp_max
+            nrp   = c._np
+            rtmin = c._rt_min
+            rtmax = c._rt_max
+            nrt   = c._nt
+            rmin  = 0.
+            rmax  = c._rt_max
+            nr    = c._nt
+            ss    = 10
+            wed = wedgize.wedge(rpmin=rpmin,rpmax=rpmax,nrp=nrp,rtmin=rtmin,rtmax=rtmax,nrt=nrt,rmin=rmin,rmax=rmax,nr=nr,mumin=mumin,mumax=mumax,ss=ss)
+        
+            r,d,ivar = wed.wedge(c._da,c._co)
+            e = sp.sqrt(sp.diag(ivar))
+            coef = sp.power(r,x_power)
+            if not c._isfit:
+                plt.errorbar(r,coef*d,yerr=coef*e,linewidth=4,label=r'$'+c._title+'$')
+            else:
+                plt.errorbar(r,coef*d,linewidth=4,label=r'$'+c._title+'$')
+
+        plt.title(r"$"+str(mumin)+" < \mu < "+str(mumax)+"$",fontsize=30)
+        plt.xlabel(r'$r \, [h^{-1} \, \mathrm{Mpc}]$',fontsize=30)
+        if (x_power==0):
+            plt.ylabel(r'$\xi(r)$',fontsize=30)
+        if (x_power==1):
+            plt.ylabel(r'$r \cdot \xi(r) \, [h^{-1} \, \mathrm{Mpc}]$',fontsize=30)
+        if (x_power==2):
+            plt.ylabel(r'$r^{2} \cdot \xi(r) \, [(h^{-1} \, \mathrm{Mpc})^{2}]$',fontsize=30)
+        plt.legend(fontsize=30, numpoints=1,ncol=2, loc=1)
+        plt.grid()
+        plt.show()
+    
         return
     def plot_cov(self):
 

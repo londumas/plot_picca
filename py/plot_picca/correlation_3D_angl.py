@@ -180,7 +180,11 @@ class Correlation3D_angl:
         crt = 1./scipy.constants.degree
         list_corr = [self] + other
 
-        for el in list_corr:
+        lst = [0,0,9,9]
+        for i, el in enumerate(list_corr):
+
+            sliceX = lst[i]
+
             if (sliceX is not None):
                 cut  = (el._rt>=el._rt_min+el._binSizeT*sliceX) & (el._rt<el._rt_min+el._binSizeT*(sliceX+1))
                 cut &= (el._we>0.)
@@ -199,16 +203,19 @@ class Correlation3D_angl:
                 plt.errorbar(xxx,yyy,linewidth=4,label=r'$'+el._title+'$')
             else:
                 plt.errorbar(xxx,yyy,yerr=yer,linewidth=4,label=r'$'+el._title+'$')
+            #minY = el._rp_min+el._binSizeP*sliceY
+            #maxY = el._rp_min+el._binSizeP*(sliceY+1)
+            #print str(minY)+" < \lambda_{1}/\lambda_{2} < "+str(maxY)
 
         if (sliceX is not None):
             minX = el._rt_min+el._binSizeT*sliceX
             maxX = el._rt_min+el._binSizeT*(sliceX+1)
-            plt.title(r"$"+str(minX)+" < \theta < "+str(maxX)+"$",fontsize=30)
+            plt.title(r"$"+str(minX)+" < \\theta < "+str(maxX)+"$",fontsize=30)
             plt.xlabel(r'$\lambda_{1}/\lambda_{2}$',fontsize=30)
         if (sliceY is not None):
             minY = el._rp_min+el._binSizeP*sliceY
             maxY = el._rp_min+el._binSizeP*(sliceY+1)
-            plt.title(r"$"+str(minY)+" < \lambda_{1}/\lambda_{2} < "+str(maxY)+"$",fontsize=30)
+            #plt.title(r"$"+str(minY)+" < \lambda_{1}/\lambda_{2} < "+str(maxY)+"$",fontsize=30)
             plt.xlabel(r'$\theta \, [\mathrm{deg}]$',fontsize=30)
         plt.ylabel(r'$\xi$',fontsize=30)
         plt.legend(fontsize=20, numpoints=1,ncol=2, loc=1)

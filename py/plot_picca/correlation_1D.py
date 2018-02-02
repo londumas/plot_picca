@@ -121,13 +121,17 @@ class Correlation1D:
             if x.size==0: continue
             if not redshiftLine is None:
                 x = x/redshiftLine-1.
-            plt.plot(x,y,linewidth=4)
+            if c._title is not None:
+                plt.plot(x,y,linewidth=4,label=r"$"+c._title+"$")
+            else:plt.plot(x,y,linewidth=4)
+                
 
         if not redshiftLine is None:
             plt.xlabel(r'$z$',fontsize=30)
         else:
-            plt.xlabel(r'$\lambda_{\mathrm{Obs.}} \, \mathrm{\AA{}}$',fontsize=30)
-        plt.ylabel(r'$\xi^{ff,1D}$',fontsize=30)
+            plt.xlabel(r'$\lambda_{\mathrm{Obs.}} \, [\mathrm{\AA{}}]$',fontsize=30)
+        plt.ylabel(r'$\sigma^{2}(\lambda_{\mathrm{Obs.}})$',fontsize=30)
+        plt.legend(fontsize=20, numpoints=1,ncol=2, loc=1)
         plt.grid()
         plt.show()
 
@@ -161,8 +165,9 @@ class Correlation1D:
                 maxY = y.max()
             else:
                 maxY = max(maxY,y.max())
+            maxY = 0.3
 
-        for c in lst_corr:
+        for c in lst_corr[:1]:
 
             x = c._cor[:,0]
             y = c._cor[:,1]
@@ -200,7 +205,7 @@ class Correlation1D:
             plt.xlabel(r'$\Delta r_{\parallel} \, [\mathrm{Mpc \, h^{-1}}]$',fontsize=30)
         else:
             plt.xlabel(r'$\lambda_{1}/\lambda_{2}$',fontsize=30)
-        plt.ylabel(r'$\xi^{ff,1D}(\lambda_{1},\lambda_{2}) \, [\mathrm{normed}]$',fontsize=30)
+        plt.ylabel(r'$\xi^{1D}(\lambda_{1}/\lambda_{2})/\sqrt{\xi^{1D}(\lambda_{1})\xi^{1D}(\lambda_{2})}$',fontsize=30)
         plt.legend(fontsize=20, numpoints=1,ncol=2, loc=1)
         plt.grid()
         plt.tight_layout()
