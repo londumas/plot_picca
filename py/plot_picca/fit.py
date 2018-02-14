@@ -20,20 +20,20 @@ class Fit:
 
         if (dic is None):
             dic = copy.deepcopy(raw_dic_class)
-    
+
         self._name     = dic["name"]
         self._param    = None
         self._fitAtrrs = None
         self._da       = None
         self.read_fit_results(dic["path"],dic["name"])
-    
+
         return
-    
+
     def read_fit_results(self,path,name):
-    
+
         path = os.path.expandvars(path)
         f = h5py.File(path,"r")
-        
+
         ### Parameters
         self._param    = {}
         self._fitAtrrs = {}
@@ -52,26 +52,44 @@ class Fit:
                 tmp["error"] = f["best fit"].attrs[el][1]
                 tmp["name"]  = str(el)
                 self._param[str(el)] = tmp
-        
+
         ### Set errors to zero for unfitted param
         for el in self._fitAtrrs["list of fixed pars"]:
             self._param[el]["error"] = 0.
-        
+
+        ### Minimum
+        if 'minimum' in [el.decode('UTF-8') for el in f.keys()]:
+            self._minimum = {}
+            for item, value in f['minimum'].attrs.items():
+                self._minimum[str(item)] = value
+
         ### Best fit
-        self._fitAtrrs["own_chi2"] = f[name].attrs["chi2"]
-        self._da = f[name]["fit"].value
-        
+        if name in [ el.decode('UTF-8') for el in f.keys()]:
+            self._fitAtrrs["own_chi2"] = f[name].attrs["chi2"]
+            self._da = f[name]["fit"].value
+        else:
+            print('ERROR: {} is not part of file'.format(name))
+
+        ### minos
+        if 'minos' in [ el.decode('UTF-8') for el in f.keys()]:
+            self.minos = {}
+            for par in f['minos'].keys():
+                dic = {}
+                for item, value in f['minos'][par].attrs.items():
+                    dic[str(item)] = value
+                self.minos[str(par)] = dic
+
         ### Set proba
         self._fitAtrrs["proba"] = 1.-sp.stats.chi2.cdf(self._fitAtrrs["fval"],self._fitAtrrs["ndata"]-self._fitAtrrs["npar"])
-        
+
         f.close()
-    
+
         return
     def print_fitted_par(self,lst=None,coeffBias=1.,header=True):
-    
+
         if lst is None:
             lst = self._fitAtrrs["list of free pars"]
-    
+
         if header:
             ### 
             to_print0  = " || " + "".ljust(30) + " || "
@@ -98,7 +116,7 @@ class Fit:
             err = utils.format_number_with_precision(err,err)
             to_print += (val + " +/- " + err).ljust(20)
             to_print += " || "
-            
+
         val = self._fitAtrrs["fval"]
         err = 0.1
         val = utils.format_number_with_precision(val,err)
@@ -108,21 +126,7 @@ class Fit:
         proba = utils.format_number_with_precision(proba,proba)
         s       = val + ' / (' + nbBin + '-' + nbParam + '),  p = ' + proba
         to_print  += s.ljust(30) + " || "
-            
+
         print(to_print)
-    
+
         return
-
-
-
-
-
-
-
-
-
-
-
-
-
-
