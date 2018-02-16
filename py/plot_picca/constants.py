@@ -36,3 +36,20 @@ absorber_IGM = {
     'OVI(1032)'   : 1031.912,
     'LYB'         : 1025.72,
 }
+latex_name = {
+    '1+f'                : '1+f',
+    'SigmaNL_perp'       : '\sigma_{\mathrm{NL},\perp}',
+    'alpha_LYA'          : '\\alpha_{\mathrm{Ly}\\alpha}',
+    'ap'                 : '\\alpha_{\\parallel}',
+    'at'                 : '\\alpha_{\\perp}',
+    'beta_LYA'           : '',
+    'beta_QSO'           : '',
+    'bias_LYA'           : '',
+    'bias_QSO'           : '',
+    'croom_par0'         : '',
+    'croom_par1'         : '',
+    'drp'                : '',
+    'growth_rate'        : '',
+    'sigmaNL_per'        : '',
+    'sigma_velo_lorentz' : '',
+}

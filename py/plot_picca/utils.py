@@ -129,4 +129,3 @@ def dist_lines_RF(lRF1,lRF2,lObs):
     return deltaRP
 
 
-
