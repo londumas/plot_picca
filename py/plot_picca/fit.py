@@ -1,4 +1,5 @@
 ### Python lib
+from __future__ import print_function
 import scipy as sp
 import scipy.stats
 import copy
@@ -40,9 +41,9 @@ class Fit:
                     'up', 'fval', 'is_valid', 'is_above_max_edm', 'has_covariance', 'has_made_posdef_covar',
                     'has_valid_parameters', 'edm', 'nfcn']
         for el in f["best fit"].attrs:
-            if any( ell in el for ell in lst_forFit):
+            if any( str(ell) in el for ell in lst_forFit):
                 if str(el)=="list of free pars" or str(el)=="list of fixed pars":
-                    self._fitAtrrs[str(el)]=[ ell.decode('UTF-8') for ell in f["best fit"].attrs[el]]
+                    self._fitAtrrs[str(el)]=[ str(ell) for ell in f["best fit"].attrs[el]]
                 else:
                     self._fitAtrrs[str(el)]=f["best fit"].attrs[el]
             else:
@@ -69,7 +70,6 @@ class Fit:
                 dic[str(item)] = value
             dic['fit'] = f[d]["fit"].value
             self._data[str(d)] = dic
-            print(dic['ndata'],dic['chi2'])
         
         ### minos
         if 'minos' in [ el.decode('UTF-8') for el in f.keys()]:
@@ -91,7 +91,6 @@ class Fit:
                     for item, value in f['chi2 scan'][p].attrs.items():
                         dic[str(item)] = value
                     self.chi2scan[str(p)] = dic
-                    print(p, self.chi2scan[str(p)])
                 else:
                     self.chi2scan_result['parameters'] = {}
                     for item, value in f['chi2 scan'][p].attrs.items():
@@ -189,5 +188,28 @@ class Fit:
         to_print  += s.ljust(30) + " || "
 
         print(to_print)
+
+        return
+    def print_contribution_chi2(self):
+
+        def print_chi2(chi2,nbBin,nbParam):
+
+            val = chi2
+            err = 0.1
+            val = utils.format_number_with_precision(val,err)
+            proba = 1.-sp.stats.chi2.cdf(chi2,nbBin-nbParam)
+            proba = utils.format_number_with_precision(proba,proba)
+            s = val + ' / (' + str(nbBin) + '-' + str(nbParam) + '),  p = ' + proba
+
+            return s
+
+        data = self._fitAtrrs
+        npar = data["npar"]
+        chi2 = print_chi2(data['fval'],data['ndata'],npar)
+        print('all',chi2)
+        for d in sorted(self._data.keys()):
+            data = self._data[d]
+            chi2 = print_chi2(data['chi2'],data['ndata'],npar)
+            print(d,chi2)
 
         return

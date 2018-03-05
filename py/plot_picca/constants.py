@@ -38,13 +38,13 @@ absorber_IGM = {
 }
 latex_name = {
     '1+f'                : '1+f',
-    'SigmaNL_perp'       : '\sigma_{\mathrm{NL},\perp}',
-    'alpha_LYA'          : '\\alpha_{\mathrm{Ly}\\alpha}',
+    'SigmaNL_perp'       : '\\sigma_{\\mathrm{NL},\\perp}',
+    'alpha_LYA'          : '\\alpha_{\\mathrm{Ly}\\alpha}',
     'ap'                 : '\\alpha_{\\parallel}',
     'at'                 : '\\alpha_{\\perp}',
-    'beta_LYA'           : '',
+    'beta_LYA'           : '\\beta_{\mathrm{Ly}\\alpha}',
     'beta_QSO'           : '',
-    'bias_LYA'           : '',
+    'bias_LYA'           : 'b_{\\mathrm{Ly}\\alpha}',
     'bias_QSO'           : '',
     'croom_par0'         : '',
     'croom_par1'         : '',
