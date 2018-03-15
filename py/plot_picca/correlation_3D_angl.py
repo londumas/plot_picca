@@ -4,7 +4,7 @@ import scipy as sp
 import copy
 import matplotlib.pyplot as plt
 import scipy.constants
-from . import utils
+from . import utils, constants
 
 raw_dic_class = {
     "correlation"             : "",
@@ -74,7 +74,7 @@ class Correlation3D_angl:
         self._rt = self._rt*self._we
         self._z  = self._z*self._we
         self._da = self._da*self._we
-        
+
         self._nb += other._nb
         self._we += other._we
         self._rp += other._rp*other._we
@@ -87,13 +87,13 @@ class Correlation3D_angl:
         self._rt[cut] /= self._we[cut]
         self._z[cut]  /= self._we[cut]
         self._da[cut] /= self._we[cut]
-        
+
         return self
     def __sub__(self,other):
-    
+
         assert(self._da.size==other._da.size)
         self._da -= other._da
-    
+
         return self
 
     def multiply(self,scalar):
@@ -106,7 +106,7 @@ class Correlation3D_angl:
         vac = fitsio.FITS(path)
 
         head = vac[1].read_header()
-    
+
         ### Grid
         self._nt = head['NT']
         self._np = head['NP']
@@ -116,12 +116,12 @@ class Correlation3D_angl:
         self._rp_max = head['RPMAX']
         self._binSizeP = (self._rp_max-self._rp_min) / self._np
         self._binSizeT = (self._rt_max-self._rt_min) / self._nt
-        
+
         self._rp = vac[1]['RP'][:]
         self._rt = vac[1]['RT'][:]
         self._z  = vac[1]['Z'][:]
         self._nb = vac[1]['NB'][:]
-    
+
         ### Correlation
         we  = vac[2]['WE'][:]
         da  = vac[2]['DA'][:]
@@ -129,13 +129,13 @@ class Correlation3D_angl:
         cut = (self._we>0.)
         self._da       = (da*we).sum(axis=0)
         self._da[cut] /= self._we[cut]
-        
+
         vac.close()
 
         return
     def plot_2d(self,log=False):
         crt = 1./scipy.constants.degree
-        
+
         if ((self._we>0.).sum()==0):
             print("no data")
             return
@@ -145,14 +145,14 @@ class Correlation3D_angl:
         if (self._correlation=='o_f' or self._correlation=='f_f2'):
             origin='upper'
             extent=[crt*self._rt_min, crt*self._rt_max, self._rp_max, self._rp_min]
-    
+
         yyy = sp.copy(self._da)
         w = (self._we>0.) & (self._nb>10.)
         yyy[sp.logical_not(w)] = float('nan')
         if log:
             yyy[w] = sp.log10( sp.absolute(yyy[w]))
         yyy = utils.convert1DTo2D(yyy,self._np,self._nt)
-    
+
         fig = plt.figure()
         ax = fig.add_subplot(111)
         ax.set_xticks([ i for i in sp.arange(crt*self._rt_min, crt*self._rt_max,crt*self._binSizeT*10) ])
@@ -160,8 +160,8 @@ class Correlation3D_angl:
 
         plt.imshow(yyy, origin=origin, extent=extent, interpolation='nearest', aspect='auto')
         cbar = plt.colorbar()
-    
-        if not log: 
+
+        if not log:
             cbar.set_label(r'$\xi(\lambda_{1}/\lambda_{2},\theta)$',size=40)
         else:
             cbar.set_label(r'$ \log10 \, |\xi(\lambda_{1}/\lambda_{2},\theta)| $',size=40)
@@ -175,15 +175,12 @@ class Correlation3D_angl:
         plt.show()
 
         return
-    def plot_slice_2d(self,sliceX=None,sliceY=None, other=[]):
-    
+    def plot_slice_2d(self,sliceX=None,sliceY=None, other=[],coefX=1.):
+
         crt = 1./scipy.constants.degree
         list_corr = [self] + other
 
-        lst = [0,0,9,9]
         for i, el in enumerate(list_corr):
-
-            sliceX = lst[i]
 
             if (sliceX is not None):
                 cut  = (el._rt>=el._rt_min+el._binSizeT*sliceX) & (el._rt<el._rt_min+el._binSizeT*(sliceX+1))
@@ -200,9 +197,9 @@ class Correlation3D_angl:
                 yer = el._er[cut]
 
             if el._er is None:
-                plt.errorbar(xxx,yyy,linewidth=4,label=r'$'+el._title+'$')
+                plt.errorbar(coefX*xxx,yyy,linewidth=4,label=r'$'+el._title+'$')
             else:
-                plt.errorbar(xxx,yyy,yerr=yer,linewidth=4,label=r'$'+el._title+'$')
+                plt.errorbar(coefX*xxx,yyy,yerr=yer,linewidth=4,label=r'$'+el._title+'$')
             #minY = el._rp_min+el._binSizeP*sliceY
             #maxY = el._rp_min+el._binSizeP*(sliceY+1)
             #print str(minY)+" < \lambda_{1}/\lambda_{2} < "+str(maxY)
@@ -217,36 +214,14 @@ class Correlation3D_angl:
             maxY = el._rp_min+el._binSizeP*(sliceY+1)
             #plt.title(r"$"+str(minY)+" < \lambda_{1}/\lambda_{2} < "+str(maxY)+"$",fontsize=30)
             plt.xlabel(r'$\theta \, [\mathrm{deg}]$',fontsize=30)
+
+        for l in list(constants.absorber_IGM.keys()):
+            l = constants.absorber_IGM[l]
+            plt.plot( [l,l], [-1.,1.], color='black' )
+
         plt.ylabel(r'$\xi$',fontsize=30)
         plt.legend(fontsize=20, numpoints=1,ncol=2, loc=1)
         plt.grid()
         plt.show()
 
         return
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,5 +1,8 @@
 omegaM0 = 0.315
 
+### List of correlation possible
+lst_corr = ['o_f','f_f']
+
 ### Absorber names and wavelengths [Angstrom]
 absorber_IGM = {
     'MgI(2853)'   : 2852.96,
@@ -52,4 +55,5 @@ latex_name = {
     'growth_rate'        : '',
     'sigmaNL_per'        : '',
     'sigma_velo_lorentz' : '',
+    'bao_amp'            : 'A_{\\mathrm{BAO}}',
 }

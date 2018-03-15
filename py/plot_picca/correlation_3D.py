@@ -4,7 +4,7 @@ import scipy as sp
 import copy
 import matplotlib.pyplot as plt
 
-from . import utils
+from . import utils, constants
 from picca import wedgize
 
 raw_dic_class = {
@@ -29,6 +29,9 @@ class Correlation3D:
 
         ### info from dic
         self._correlation = dic['correlation']
+        if self._correlation not in constants.lst_corr:
+            print(self._correlation, ' is unknown')
+            sys.exit()
         self._f1 = dic["f1"]
         self._f2 = dic["f2"]
         self._o1 = dic["o1"]
@@ -310,7 +313,7 @@ class Correlation3D:
             plt.title(r"$"+str(minY)+" < r_{\parallel} < "+str(maxY)+"$",fontsize=30)
             plt.xlabel(r'$r_{\perp} \, [h^{-1} \, \mathrm{Mpc}]$',fontsize=30)
         plt.ylabel(r'$\xi(r_{\parallel},r_{\perp})$',fontsize=30)
-        plt.legend(fontsize=30, numpoints=1,ncol=2, loc=1)
+        #plt.legend(fontsize=30, numpoints=1,ncol=2, loc=1)
         plt.grid()
         plt.show()
 
@@ -348,7 +351,7 @@ class Correlation3D:
             plt.ylabel(r'$r \cdot \xi(r) \, [h^{-1} \, \mathrm{Mpc}]$',fontsize=30)
         if (x_power==2):
             plt.ylabel(r'$r^{2} \cdot \xi(r) \, [(h^{-1} \, \mathrm{Mpc})^{2}]$',fontsize=30)
-        plt.legend(fontsize=30, numpoints=1,ncol=2, loc=1)
+        #plt.legend(fontsize=30, numpoints=1,ncol=2, loc=1)
         plt.grid()
         plt.show()
     
