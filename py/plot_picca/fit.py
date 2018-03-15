@@ -70,7 +70,7 @@ class Fit:
                 dic[str(item)] = value
             dic['fit'] = f[d]["fit"].value
             self._data[str(d)] = dic
-        
+
         ### minos
         if 'minos' in [ el.decode('UTF-8') for el in f.keys()]:
             self.minos_sigma = f['minos'].attrs.values()
@@ -80,7 +80,7 @@ class Fit:
                 for item, value in f['minos'][p].attrs.items():
                     dic[str(item)] = value
                 self.minos[str(p)] = dic
-        
+
         ### chi2 scan
         if 'chi2 scan' in [ el.decode('UTF-8') for el in f.keys()]:
             self.chi2scan = {}
@@ -101,23 +101,23 @@ class Fit:
 
         return
     def plot_chi2scan(self,deltachi2=True):
-    
+
         if deltachi2:
             zlabel = '\Delta \chi^{2}'
         else:
             zlabel = '\chi^{2}'
-                
+
         dim = len(self.chi2scan)
         parameters = self.chi2scan_result['parameters']
         values     = self.chi2scan_result['values']
-        
+
         if dim==1:
             par = self.chi2scan.keys()[0]
             xxx = values[:,parameters[par]]
             zzz = values[:,parameters['fval']]
             if deltachi2:
                 zzz -= self._fitAtrrs['fval']
-            
+
             plt.plot(xxx,zzz,linewidth=4)
             plt.grid()
             plt.xlabel(r'$'+constants.latex_name[par]+'$',fontsize=30)
@@ -151,7 +151,7 @@ class Fit:
             lst = self._fitAtrrs["list of free pars"]
 
         if header:
-            ### 
+            ###
             to_print0  = " || " + "".ljust(30) + " || "
             to_print1  = " || " + "".ljust(30) + " || "
             for p in lst:

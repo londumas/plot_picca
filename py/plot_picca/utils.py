@@ -7,10 +7,10 @@ def croom(x):
     '''
         Croom et al. Law
     '''
-    
+
     r = 0.53 + 0.289*(1.+x)**2
 
-    return r 
+    return r
 def growthStructure(z, omega_M_0, unnormed=False):
 
     omega_m = 1./(1.+(1.-omega_M_0)/(omega_M_0*(1.+z)**3.))
@@ -22,13 +22,13 @@ def growthStructure(z, omega_M_0, unnormed=False):
     else:
         norm = 1./growthStructure(0.,omega_M_0, unnormed=True)
     g = norm*(5./2.)*a*omega_m/( omega_m**(4./7.)-omega_l+(1.+omega_m/2.)*(1.+omega_l/70.) )
-    
+
     return g
 def growthStructureSimple(z, omega_M_0):
 
     g  = 1./(1.+z)
     g /= 1./(1.+100)/growthStructure(100, omega_M_0)
-    
+
     return g
 def growthRateStructure(z, omega_M_0):
 
@@ -95,7 +95,7 @@ def precision_and_scale(x):
 
     return (magnitude + scale, scale)
 def format_number_with_precision(number,error,number_of_digit=2):
-    
+
     precision = get_precision(error,number_of_digit)
 
     string = round(number,precision)
@@ -104,7 +104,7 @@ def format_number_with_precision(number,error,number_of_digit=2):
 
     return string
 def dist_lines_Obs(lObs1,lObs2,lRF):
-    
+
     z1 = lObs1/lRF-1.
     z2 = lObs2/lRF-1.
     z  = (z1+z2)/2.
@@ -127,5 +127,3 @@ def dist_lines_RF(lRF1,lRF2,lObs):
     deltaRP = c*dz/hz
 
     return deltaRP
-
-

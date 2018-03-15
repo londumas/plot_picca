@@ -43,7 +43,7 @@ class Correlation3D:
             self._isfit = True
         else:
             self._isfit = False
-        
+
         if "nside" not in dic.keys():
             dic["nside"] = 16
         self._nside = dic["nside"]
@@ -78,7 +78,7 @@ class Correlation3D:
         self._rt = self._rt*self._we
         self._z  = self._z*self._we
         self._da = self._da*self._we
-        
+
         self._nb += other._nb
         self._we += other._we
         self._rp += other._rp*other._we
@@ -91,9 +91,9 @@ class Correlation3D:
         self._rt[cut] /= self._we[cut]
         self._z[cut]  /= self._we[cut]
         self._da[cut] /= self._we[cut]
-        
+
         self._r  = sp.sqrt(self._rp**2. + self._rt**2.)
-        
+
         return self
 
     def multiply(self,scalar):
@@ -108,7 +108,7 @@ class Correlation3D:
         ### bin size (only square)
         head = vac[1].read_header()
         self._binSize = head['RTMAX'] / head['NT']
-    
+
         ### Grid
         self._nt = head['NT']
         self._np = head['NP']
@@ -122,13 +122,13 @@ class Correlation3D:
             self._binSize = self._binSizeP
         else:
             print("binSizeP!=binSizeT")
-        
+
         self._rp = vac[1]['RP'][:]
         self._rt = vac[1]['RT'][:]
         self._r = sp.sqrt(self._rp**2. + self._rt**2.)
         self._z  = vac[1]['Z'][:]
         self._nb = vac[1]['NB'][:]
-    
+
         ### Correlation
         we  = vac[2]['WE'][:]
         da  = vac[2]['DA'][:]
@@ -136,12 +136,12 @@ class Correlation3D:
         cut = (self._we>0.)
         self._da       = (da*we).sum(axis=0)
         self._da[cut] /= self._we[cut]
-        
+
         vac.close()
 
         return
     def read_from_export(self,path):
-    
+
         vac = fitsio.FITS(path)
         self._rp = vac[1]['RP'][:]
         self._rt = vac[1]['RT'][:]
@@ -151,16 +151,16 @@ class Correlation3D:
         self._co = vac[1]['CO'][:]
         self._dm = vac[1]['DM'][:]
         self._nb = vac[1]['NB'][:]
-        
+
         self._er = sp.copy(sp.diag(self._co))
         cut = (self._er>0.)
         self._er[cut] = sp.sqrt(self._er[cut])
-        
+
         vac.close()
-        
+
         return
     def get_mean_redshift(self,rmin=80.,rmax=120.):
-        
+
         cut = (self._r>rmin) & (self._r<rmax)
         mz = sp.sum( self._z[cut]*self._we[cut] )/sp.sum( self._we[cut] )
 
@@ -193,7 +193,7 @@ class Correlation3D:
 
         return valid
     def plot_2d(self,x_power=0):
-    
+
         if ((self._we>0.).sum()==0):
             print("no data")
             return
@@ -203,15 +203,15 @@ class Correlation3D:
         if (self._correlation=='o_f' or self._correlation=='f_f2'):
             origin='upper'
             extent=[self._rt_min, self._rt_max, self._rp_max, self._rp_min]
-    
+
         yyy = sp.copy(self._da)
         w = (self._we>0.) & (self._nb>10.)
         yyy[sp.logical_not(w)] = float('nan')
         xxx = utils.convert1DTo2D(self._r,self._np,self._nt)
         yyy = utils.convert1DTo2D(yyy,self._np,self._nt)
-        
+
         coef = sp.power(xxx,x_power)
-    
+
         fig = plt.figure()
         ax = fig.add_subplot(111)
         #ax.set_xticks([ i for i in sp.arange(self._minX2D-50., self._maxX2D+50., 50.) ])
@@ -219,7 +219,7 @@ class Correlation3D:
 
         plt.imshow(coef*yyy, origin=origin,extent=extent, interpolation='nearest')
         cbar = plt.colorbar()
-    
+
         if (x_power==0):
             cbar.set_label(r'$\xi(\, r_{\parallel},r_{\perp} \,)$',size=40)
         if (x_power==1):
@@ -296,7 +296,7 @@ class Correlation3D:
             yyy = el._da[cut]
             if not el._er is None:
                 yer = el._er[cut]
-                
+
             if el._er is None:
                 plt.errorbar(xxx,yyy,linewidth=4,label=r'$'+el._title+'$')
             else:
@@ -319,9 +319,9 @@ class Correlation3D:
 
         return
     def plot_wedge(self,x_power=0,mumin=-1.,mumax=1., other=[]):
-    
+
         list_corr = [self] + other
-        
+
         for i,c in enumerate(list_corr):
             rpmin = c._rp_min
             rpmax = c._rp_max
@@ -334,7 +334,7 @@ class Correlation3D:
             nr    = c._nt
             ss    = 10
             wed = wedgize.wedge(rpmin=rpmin,rpmax=rpmax,nrp=nrp,rtmin=rtmin,rtmax=rtmax,nrt=nrt,rmin=rmin,rmax=rmax,nr=nr,mumin=mumin,mumax=mumax,ss=ss)
-        
+
             r,d,ivar = wed.wedge(c._da,c._co)
             e = sp.sqrt(sp.diag(ivar))
             coef = sp.power(r,x_power)
@@ -354,7 +354,7 @@ class Correlation3D:
         #plt.legend(fontsize=30, numpoints=1,ncol=2, loc=1)
         plt.grid()
         plt.show()
-    
+
         return
     def plot_cov(self):
 
@@ -374,14 +374,14 @@ class Correlation3D:
             plt.grid()
             plt.show()
         if True:
-            cor = utils.getCorrelationMatrix(cov) 
+            cor = utils.getCorrelationMatrix(cov)
             ###
             #plt.imshow(cor, interpolation='nearest')
             #plt.show()
             ###
             yMin = None
             yMax = None
-            for i in range(3): 
+            for i in range(3):
                 mcor = sp.asarray( [ sp.mean(sp.diag(cor,k=i+self._nt*k)) for k in sp.arange(self._np) ]  )
                 plt.plot(sp.arange(mcor.size)*self._binSize,mcor,linewidth=2,label=r"$\Delta r_{\perp} = "+str(int(i*self._binSize))+"$")
 
@@ -410,33 +410,3 @@ class Correlation3D:
             plt.show()
 
         return
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -107,7 +107,7 @@ class Correlation1D:
                 self._cor[i,3] = tnb
 
         vac.close()
-    
+
         return
     def plot_var(self,other=[],redshiftLine=None):
 
@@ -124,7 +124,7 @@ class Correlation1D:
             if c._title is not None:
                 plt.plot(x,y,linewidth=4,label=r"$"+c._title+"$")
             else:plt.plot(x,y,linewidth=4)
-                
+
 
         if not redshiftLine is None:
             plt.xlabel(r'$z$',fontsize=30)
@@ -142,7 +142,7 @@ class Correlation1D:
 
         ###
         minY = None
-        maxY = None        
+        maxY = None
         for c in lst_corr:
             x = c._cor[:,0]
             y = c._cor[:,1]
@@ -184,7 +184,7 @@ class Correlation1D:
                     la2 = c._listAbs2
                 else:
                     la2 = c._listAbs1
-                
+
                 lst_lines = []
                 for a1,l1 in la1.items():
                     for a2,l2 in la2.items():
@@ -222,7 +222,7 @@ class Correlation1D:
             da = utils.getCorrelationMatrix(da)
         w = (self._mat["WE"]>0.) & (self._mat["NB"]>10)
         da[ sp.logical_not(w) ] = sp.nan
-        
+
         fig = plt.figure()
         ax = fig.add_subplot(111)
         plt.imshow(da,origin="lower",interpolation='nearest')
@@ -244,13 +244,3 @@ class Correlation1D:
         plt.show()
 
         return
-
-
-
-
-
-
-
-
-
-
