@@ -286,7 +286,7 @@ class Correlation3D:
 
         list_corr = [self] + other
 
-        for i,el in enumerate(list_corr):
+        for el in list_corr:
             if (sliceX is not None):
                 cut = (el._rt>=el._rt_min+el._binSizeT*sliceX) & (el._rt<el._rt_min+el._binSizeT*(sliceX+1))
                 xxx = el._rp[cut]
@@ -322,7 +322,7 @@ class Correlation3D:
 
         list_corr = [self] + other
 
-        for i,c in enumerate(list_corr):
+        for c in list_corr:
             rpmin = c._rp_min
             rpmax = c._rp_max
             nrp   = c._np

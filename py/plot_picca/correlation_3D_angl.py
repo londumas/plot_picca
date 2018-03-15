@@ -180,7 +180,7 @@ class Correlation3D_angl:
         crt = 1./scipy.constants.degree
         list_corr = [self] + other
 
-        for i, el in enumerate(list_corr):
+        for el in list_corr:
 
             if (sliceX is not None):
                 cut  = (el._rt>=el._rt_min+el._binSizeT*sliceX) & (el._rt<el._rt_min+el._binSizeT*(sliceX+1))
@@ -210,8 +210,8 @@ class Correlation3D_angl:
             plt.title(r"$"+str(minX)+" < \\theta < "+str(maxX)+"$",fontsize=30)
             plt.xlabel(r'$\lambda_{1}/\lambda_{2}$',fontsize=30)
         if (sliceY is not None):
-            minY = el._rp_min+el._binSizeP*sliceY
-            maxY = el._rp_min+el._binSizeP*(sliceY+1)
+            #minY = el._rp_min+el._binSizeP*sliceY
+            #maxY = el._rp_min+el._binSizeP*(sliceY+1)
             #plt.title(r"$"+str(minY)+" < \lambda_{1}/\lambda_{2} < "+str(maxY)+"$",fontsize=30)
             plt.xlabel(r'$\theta \, [\mathrm{deg}]$',fontsize=30)
 
