@@ -220,7 +220,7 @@ class Correlation3D_angl:
             plt.plot( [l,l], [-1.,1.], color='black' )
 
         plt.ylabel(r'$\xi$',fontsize=30)
-        plt.legend(fontsize=20, numpoints=1,ncol=2, loc=1)
+        #plt.legend(fontsize=20, numpoints=1,ncol=2, loc=1)
         plt.grid()
         plt.show()
 

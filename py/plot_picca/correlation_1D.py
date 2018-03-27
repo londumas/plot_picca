@@ -153,9 +153,9 @@ class Correlation1D:
             if not redshiftLine is None:
                 x = utils.dist_lines_Obs(lObs1=redshiftLine[0],lObs2=redshiftLine[0]/x,lRF=redshiftLine[1])
             if c._title is not None:
-                plt.plot(x,y,linewidth=4,label=r"$"+c._title+"$")
+                plt.plot(x,y,linewidth=4,label=r"$"+c._title+"$",marker='o')
             else:
-                plt.plot(x,y,linewidth=4)
+                plt.plot(x,y,linewidth=4,marker='o')
 
             if minY is None:
                 minY = y.min()
@@ -199,7 +199,9 @@ class Correlation1D:
                         if not redshiftLine is None:
                             q = utils.dist_lines_Obs(lObs1=redshiftLine[0],lObs2=redshiftLine[0]/q,lRF=redshiftLine[1])
                         plt.plot( [q,q], [minY,maxY], color="black")
-                        plt.text( q, 0.95*maxY, s=r"$\mathrm{"+a1+"\,-\,"+a2+"}$", rotation='vertical', fontsize=15)
+                        if l1<l2: name = a1+"\,/\,"+a2
+                        else: name = a2+"\,/\,"+a1
+                        plt.text( q, 0.95*maxY, s=r"$\mathrm{"+name+"}$", rotation='vertical', fontsize=15)
 
         if not redshiftLine is None:
             plt.xlabel(r'$\Delta r_{\parallel} \, [\mathrm{Mpc \, h^{-1}}]$',fontsize=30)

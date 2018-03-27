@@ -39,7 +39,7 @@ class Fit:
         lst_forFit = ['cov[','ndata', 'npar', 'list of free pars', 'list of fixed pars',
                     'hesse_failed', 'has_reached_call_limit', 'has_accurate_covar', 'has_posdef_covar',
                     'up', 'fval', 'is_valid', 'is_above_max_edm', 'has_covariance', 'has_made_posdef_covar',
-                    'has_valid_parameters', 'edm', 'nfcn']
+                    'has_valid_parameters', 'edm', 'nfcn', 'zeff']
         for el in f["best fit"].attrs:
             if any( str(ell) in el for ell in lst_forFit):
                 if str(el)=="list of free pars" or str(el)=="list of fixed pars":

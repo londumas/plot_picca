@@ -18,6 +18,7 @@ raw_dic_class = {
     "path"                    : None,
     "title"                   : "",
     "nside"                   : None,
+    'read'                    : 'read_from_do_cor',
 }
 
 class Correlation3D:
@@ -68,7 +69,8 @@ class Correlation3D:
         self._er = None
 
 
-        self.read_from_do_cor(dic["path"])
+        read = getattr(self, dic['read'])
+        read(dic["path"])
 
         return
 
@@ -143,6 +145,25 @@ class Correlation3D:
     def read_from_export(self,path):
 
         vac = fitsio.FITS(path)
+
+        ### bin size (only square)
+        head = vac[1].read_header()
+        self._binSize = head['RTMAX'] / head['NT']
+
+        ### Grid
+        self._nt = head['NT']
+        self._np = head['NP']
+        self._rt_min = 0.
+        self._rt_max = head['RTMAX']
+        self._rp_min = head['RPMIN']
+        self._rp_max = head['RPMAX']
+        self._binSizeP = (self._rp_max-self._rp_min) / self._np
+        self._binSizeT = (self._rt_max-self._rt_min) / self._nt
+        if self._binSizeP==self._binSizeT:
+            self._binSize = self._binSizeP
+        else:
+            print("binSizeP!=binSizeT")
+
         self._rp = vac[1]['RP'][:]
         self._rt = vac[1]['RT'][:]
         self._r  = sp.sqrt(self._rp**2. + self._rt**2.)
@@ -153,6 +174,7 @@ class Correlation3D:
         self._nb = vac[1]['NB'][:]
 
         self._er = sp.copy(sp.diag(self._co))
+        self._we = sp.copy(sp.diag(self._co))
         cut = (self._er>0.)
         self._er[cut] = sp.sqrt(self._er[cut])
 
