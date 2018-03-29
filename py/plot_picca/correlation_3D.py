@@ -372,8 +372,9 @@ class Correlation3D:
             plt.ylabel(r'$r \cdot \xi^{qf}(r) \, [h^{-1} \, \mathrm{Mpc}]$',fontsize=30)
         if (x_power==2):
             plt.ylabel(r'$r^{2} \cdot \xi^{qf}(r) \, [(h^{-1} \, \mathrm{Mpc})^{2}]$',fontsize=30)
-        #plt.legend(fontsize=30, numpoints=1,ncol=2, loc=1)
+        plt.legend(fontsize=30, numpoints=1,ncol=2, loc=1)
         plt.grid()
+        plt.tight_layout()
         plt.show()
 
         return

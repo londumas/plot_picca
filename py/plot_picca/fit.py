@@ -43,7 +43,7 @@ class Fit:
         for el in f['best fit'].attrs:
             if any( str(ell) in el for ell in lst_forFit):
                 if str(el)=='list of free pars' or str(el)=='list of fixed pars':
-                    self._fitAtrrs[str(el)]=[ str(ell) for ell in f['best fit'].attrs[el]]
+                    self._fitAtrrs[str(el)]=[ ell.decode('UTF-8') for ell in f['best fit'].attrs[el]]
                 else:
                     self._fitAtrrs[str(el)]=f['best fit'].attrs[el]
             else:
@@ -75,7 +75,7 @@ class Fit:
             self._data[str(d)] = dic
 
         ### minos
-        if 'minos' in [ el.decode('UTF-8') for el in f.keys()]:
+        if 'minos' in [ el for el in list(f.keys())]:
             self.minos_sigma = f['minos'].attrs.values()
             self.minos = {}
             for p in f['minos'].keys():
@@ -85,7 +85,7 @@ class Fit:
                 self.minos[str(p)] = dic
 
         ### chi2 scan
-        if 'chi2 scan' in [ el.decode('UTF-8') for el in f.keys()]:
+        if 'chi2 scan' in [ el for el in list(f.keys())]:
             self.chi2scan = {}
             self.chi2scan_result = {}
             for p in f['chi2 scan'].keys():
@@ -205,7 +205,10 @@ class Fit:
         nbBin   = str(self._fitAtrrs['ndata'])
         nbParam = str(self._fitAtrrs['npar'])
         proba = self._fitAtrrs['proba']
-        proba = utils.format_number_with_precision(proba,proba)
+        if proba==0.:
+            proba = '0'
+        else:
+            proba = utils.format_number_with_precision(proba,proba)
         s       = math+val + ' / (' + nbBin + '-' + nbParam + '),  p = ' + proba+math
         to_print  += s.ljust(20) + end
 
