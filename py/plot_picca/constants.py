@@ -42,13 +42,8 @@ absorber_IGM = {
 latex_name = {
     '1+f'                : '1+f',
     'SigmaNL_perp'       : '\\sigma_{\\mathrm{NL},\\perp}',
-    'alpha_LYA'          : '\\alpha_{\\mathrm{Ly}\\alpha}',
     'ap'                 : '\\alpha_{\\parallel}',
     'at'                 : '\\alpha_{\\perp}',
-    'beta_LYA'           : '\\beta_{\mathrm{Ly}\\alpha}',
-    'beta_QSO'           : '',
-    'bias_LYA'           : 'b_{\\mathrm{Ly}\\alpha}',
-    'bias_QSO'           : '',
     'croom_par0'         : '',
     'croom_par1'         : '',
     'drp'                : '',
@@ -56,4 +51,21 @@ latex_name = {
     'sigmaNL_per'        : '',
     'sigma_velo_lorentz' : '',
     'bao_amp'            : 'A_{\\mathrm{BAO}}',
+
+    'bias_LYA'           : '(b\\beta)_{\\mathrm{Ly\\alpha}}/f',
+    'bias_QSO'           : '(b\\beta)_{\\mathrm{QSO}}/f',
+    'bias_MgII(2796)'    : '(b\\beta)_{\\mathrm{MgII(2796)}}/f',
+    'bias_MgII(2804)'    : '(b\\beta)_{\\mathrm{MgII(2804)}}/f',
+    'bias_MgI(2853)'     : '(b\\beta)_{\\mathrm{MgI(2853)}}/f',
+
+    'beta_LYA'           : '\\beta_{\mathrm{Ly}\\alpha}',
+    'beta_QSO'           : '\\beta_{\mathrm{QSO}}',
+    'beta_MgII(2796)'    : '\\beta_{\\mathrm{MgII(2796)}}',
+    'beta_MgII(2804)'    : '\\beta_{\\mathrm{MgII(2804)}}',
+    'beta_MgI(2853)'     : '\\beta_{\\mathrm{MgI(2853)}}',
+
+    'alpha_LYA'          : '\\alpha_{\\mathrm{Ly}\\alpha}',
+    'alpha_MgII(2796)'   : '\\alpha_{\\mathrm{MgII(2796)}}',
+    'alpha_MgII(2804)'   : '\\alpha_{\\mathrm{MgII(2804)}}',
+    'alpha_MgI(2853)'    : '\\alpha_{\\mathrm{MgI(2853)}}',
 }

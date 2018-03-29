@@ -30,7 +30,7 @@ class Fit:
     def read_fit_results(self,path):
 
         path = os.path.expandvars(path)
-        f = h5py.File(path,"r")
+        f = h5py.File(path,'r')
 
         ### Parameters
         self._param    = {}
@@ -40,25 +40,28 @@ class Fit:
                     'hesse_failed', 'has_reached_call_limit', 'has_accurate_covar', 'has_posdef_covar',
                     'up', 'fval', 'is_valid', 'is_above_max_edm', 'has_covariance', 'has_made_posdef_covar',
                     'has_valid_parameters', 'edm', 'nfcn', 'zeff']
-        for el in f["best fit"].attrs:
+        for el in f['best fit'].attrs:
             if any( str(ell) in el for ell in lst_forFit):
-                if str(el)=="list of free pars" or str(el)=="list of fixed pars":
-                    self._fitAtrrs[str(el)]=[ str(ell) for ell in f["best fit"].attrs[el]]
+                if str(el)=='list of free pars' or str(el)=='list of fixed pars':
+                    self._fitAtrrs[str(el)]=[ str(ell) for ell in f['best fit'].attrs[el]]
                 else:
-                    self._fitAtrrs[str(el)]=f["best fit"].attrs[el]
+                    self._fitAtrrs[str(el)]=f['best fit'].attrs[el]
             else:
                 dic = {}
-                dic["value"] = f["best fit"].attrs[el][0]
-                dic["error"] = f["best fit"].attrs[el][1]
-                dic["name"]  = str(el)
+                dic['value'] = f['best fit'].attrs[el][0]
+                dic['error'] = f['best fit'].attrs[el][1]
+                if str(el) in list(constants.latex_name.keys()):
+                    dic['name'] = constants.latex_name[str(el)]
+                else:
+                    dic['name'] = str(el)
                 self._param[str(el)] = dic
 
         ### Set errors to zero for unfitted param
-        for el in self._fitAtrrs["list of fixed pars"]:
-            self._param[el]["error"] = 0.
+        for el in self._fitAtrrs['list of fixed pars']:
+            self._param[el]['error'] = 0.
 
         ### Set proba
-        self._fitAtrrs["proba"] = 1.-sp.stats.chi2.cdf(self._fitAtrrs["fval"],self._fitAtrrs["ndata"]-self._fitAtrrs["npar"])
+        self._fitAtrrs['proba'] = 1.-sp.stats.chi2.cdf(self._fitAtrrs['fval'],self._fitAtrrs['ndata']-self._fitAtrrs['npar'])
 
         ### Best fit
         self._data = {}
@@ -68,7 +71,7 @@ class Fit:
             dic = {}
             for item, value in f[d].attrs.items():
                 dic[str(item)] = value
-            dic['fit'] = f[d]["fit"].value
+            dic['fit'] = f[d]['fit'].value
             self._data[str(d)] = dic
 
         ### minos
@@ -145,47 +148,66 @@ class Fit:
             plt.show()
 
         return
-    def print_fitted_par(self,lst=None,coeffBias=1.,header=True):
+    def print_fitted_par(self,lst=None,coeffBias=1.,header=True,latex=False,redshift=False):
+
+        if not latex:
+            deb  = ' || '
+            end  = ' || '
+            sep  = ' || '
+            pm   = ' +/- '
+            math = ''
+        else:
+            deb  = ''
+            end  = ' \\\\ '
+            sep  = ' & '
+            pm   = ' \pm '
+            math = '$'
 
         if lst is None:
-            lst = self._fitAtrrs["list of free pars"]
+            lst = self._fitAtrrs['list of free pars']
 
         if header:
             ###
-            to_print0  = " || " + "".ljust(30) + " || "
-            to_print1  = " || " + "".ljust(30) + " || "
+            to_print0  = deb + ''.ljust(20) + sep
+            to_print1  = deb + ''.ljust(20) + sep
+            if redshift:
+                to_print0 += sep+math+' z_{\mathrm{eff}} '+math+sep
+                to_print1 += sep+sep
             for p in lst:
-                to_print0 += self._param[p]["name"].ljust(20)
-                to_print0 += " || "
-                to_print1 += "".ljust(20)
-                to_print1 += " || "
-            to_print0 += "".ljust(30) + " || "
-            to_print1 += "".ljust(30) + " || "
+                to_print0 += self._param[p]['name'].ljust(20)
+                to_print0 += sep
+                to_print1 += ''.ljust(20)
+                to_print1 += sep
+            to_print0 += ''.ljust(20) + end
+            to_print1 += ''.ljust(20) + end
             print(to_print0)
             print(to_print1)
         ###
-        to_print  = " || " + self._title.ljust(30) + " || "
+        to_print  = deb + math+self._title.ljust(20)+math + sep
+        
+        val = utils.format_number_with_precision(self._fitAtrrs['zeff'],0.1)
+        to_print += math+ val +math+sep
 
         for p in lst:
-            val = self._param[p]["value"]
-            err = self._param[p]["error"]
-            if len(p)>len("bias") and p[:4]=="bias":
+            val = self._param[p]['value']
+            err = self._param[p]['error']
+            if len(p)>len('bias') and p[:4]=='bias':
                 val *= coeffBias
                 err *= coeffBias
             val = utils.format_number_with_precision(val,err)
             err = utils.format_number_with_precision(err,err)
-            to_print += (val + " +/- " + err).ljust(20)
-            to_print += " || "
+            to_print += (math+val+pm+err+math).ljust(20)
+            to_print += sep
 
-        val = self._fitAtrrs["fval"]
+        val = self._fitAtrrs['fval']
         err = 0.1
         val = utils.format_number_with_precision(val,err)
-        nbBin   = str(self._fitAtrrs["ndata"])
-        nbParam = str(self._fitAtrrs["npar"])
-        proba = self._fitAtrrs["proba"]
+        nbBin   = str(self._fitAtrrs['ndata'])
+        nbParam = str(self._fitAtrrs['npar'])
+        proba = self._fitAtrrs['proba']
         proba = utils.format_number_with_precision(proba,proba)
-        s       = val + ' / (' + nbBin + '-' + nbParam + '),  p = ' + proba
-        to_print  += s.ljust(30) + " || "
+        s       = math+val + ' / (' + nbBin + '-' + nbParam + '),  p = ' + proba+math
+        to_print  += s.ljust(20) + end
 
         print(to_print)
 
@@ -204,7 +226,7 @@ class Fit:
             return s
 
         data = self._fitAtrrs
-        npar = data["npar"]
+        npar = data['npar']
         chi2 = print_chi2(data['fval'],data['ndata'],npar)
         print('all',chi2)
         for d in sorted(self._data.keys()):

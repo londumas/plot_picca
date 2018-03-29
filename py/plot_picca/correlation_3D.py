@@ -174,7 +174,6 @@ class Correlation3D:
         self._nb = vac[1]['NB'][:]
 
         self._er = sp.copy(sp.diag(self._co))
-        self._we = sp.copy(sp.diag(self._co))
         cut = (self._er>0.)
         self._er[cut] = sp.sqrt(self._er[cut])
 
@@ -204,7 +203,7 @@ class Correlation3D:
         print("beta     = ",val)
 
         return
-    def is_valid(self):
+    def covariance_is_valid(self):
 
         valid = True
         ### Covariance matrix
@@ -327,14 +326,14 @@ class Correlation3D:
         if (sliceX is not None):
             minX = el._rt_min+el._binSizeT*sliceX
             maxX = el._rt_min+el._binSizeT*(sliceX+1)
-            plt.title(r"$"+str(minX)+" < r_{\perp} < "+str(maxX)+"$",fontsize=30)
+            plt.title(r"$"+str(int(minX))+" < r_{\perp} < "+str(int(maxX))+"$",fontsize=30)
             plt.xlabel(r'$r_{\parallel} \, [h^{-1} \, \mathrm{Mpc}]$',fontsize=30)
         if (sliceY is not None):
             minY = el._rp_min+el._binSizeP*sliceY
             maxY = el._rp_min+el._binSizeP*(sliceY+1)
             plt.title(r"$"+str(minY)+" < r_{\parallel} < "+str(maxY)+"$",fontsize=30)
             plt.xlabel(r'$r_{\perp} \, [h^{-1} \, \mathrm{Mpc}]$',fontsize=30)
-        plt.ylabel(r'$\xi(r_{\parallel},r_{\perp})$',fontsize=30)
+        plt.ylabel(r'$\xi^{qf}(r_{\parallel},r_{\perp})$',fontsize=30)
         #plt.legend(fontsize=30, numpoints=1,ncol=2, loc=1)
         plt.grid()
         plt.show()
@@ -368,11 +367,11 @@ class Correlation3D:
         plt.title(r"$"+str(mumin)+" < \mu < "+str(mumax)+"$",fontsize=30)
         plt.xlabel(r'$r \, [h^{-1} \, \mathrm{Mpc}]$',fontsize=30)
         if (x_power==0):
-            plt.ylabel(r'$\xi(r)$',fontsize=30)
+            plt.ylabel(r'$\xi^{qf}(r)$',fontsize=30)
         if (x_power==1):
-            plt.ylabel(r'$r \cdot \xi(r) \, [h^{-1} \, \mathrm{Mpc}]$',fontsize=30)
+            plt.ylabel(r'$r \cdot \xi^{qf}(r) \, [h^{-1} \, \mathrm{Mpc}]$',fontsize=30)
         if (x_power==2):
-            plt.ylabel(r'$r^{2} \cdot \xi(r) \, [(h^{-1} \, \mathrm{Mpc})^{2}]$',fontsize=30)
+            plt.ylabel(r'$r^{2} \cdot \xi^{qf}(r) \, [(h^{-1} \, \mathrm{Mpc})^{2}]$',fontsize=30)
         #plt.legend(fontsize=30, numpoints=1,ncol=2, loc=1)
         plt.grid()
         plt.show()
@@ -398,8 +397,10 @@ class Correlation3D:
         if True:
             cor = utils.getCorrelationMatrix(cov)
             ###
-            #plt.imshow(cor, interpolation='nearest')
-            #plt.show()
+            tcor = cor.copy()
+            tcor[tcor==1.] = sp.nan
+            plt.imshow(tcor, interpolation='nearest')
+            plt.show()
             ###
             yMin = None
             yMax = None
