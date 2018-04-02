@@ -1,7 +1,7 @@
 omegaM0 = 0.315
 
 ### List of correlation possible
-lst_corr = ['o_f','f_f']
+lst_corr = ['o_f','f_f','o_o']
 
 ### Absorber names and wavelengths [Angstrom]
 absorber_IGM = {
