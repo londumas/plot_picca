@@ -196,7 +196,7 @@ class Fit:
             print(to_print1)
         ###
         to_print  = deb + math+self._title.ljust(20)+math + sep
-        
+
         val = utils.format_number_with_precision(self._fitAtrrs['zeff'],0.1)
         to_print += math+ val +math+sep
 
