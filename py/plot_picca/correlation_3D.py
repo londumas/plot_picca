@@ -258,9 +258,10 @@ class Correlation3D:
         plt.show()
 
         return
-    def plot_1d(self,x_power=0, other=[]):
+    def plot_1d(self,x_power=0, other=None):
 
-        list_corr = [self] + other
+        if not other is None:
+            list_corr = [self] + other
 
         for el in list_corr:
             r_max = sp.amax(el._r)
@@ -303,9 +304,10 @@ class Correlation3D:
         plt.show()
 
         return
-    def plot_slice_2d(self,sliceX=None,sliceY=None, other=[]):
+    def plot_slice_2d(self,sliceX=None,sliceY=None, other=None):
 
-        list_corr = [self] + other
+        if not other is None:
+            list_corr = [self] + other
 
         for el in list_corr:
             if (sliceX is not None):
@@ -339,9 +341,10 @@ class Correlation3D:
         plt.show()
 
         return
-    def plot_wedge(self,x_power=0,mumin=-1.,mumax=1., other=[]):
+    def plot_wedge(self,x_power=0,mumin=-1.,mumax=1., other=None):
 
-        list_corr = [self] + other
+        if not other is None:
+            list_corr = [self] + other
 
         for c in list_corr:
             rpmin = c._rp_min

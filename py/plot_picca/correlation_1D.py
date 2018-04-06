@@ -109,9 +109,11 @@ class Correlation1D:
         vac.close()
 
         return
-    def plot_var(self,other=[],redshiftLine=None):
+    def plot_var(self,other=None,redshiftLine=None):
 
-        lst_corr = [self] + other
+        if not other is None:
+            lst_corr = [self] + other
+
         for c in lst_corr:
             x = c._var[:,0]
             y = c._var[:,1]
@@ -136,9 +138,10 @@ class Correlation1D:
         plt.show()
 
         return
-    def plot_cor(self,other=[],lines=False,lineToShow=None,redshiftLine=None):
+    def plot_cor(self,other=None,lines=False,lineToShow=None,redshiftLine=None):
 
-        lst_corr = [self] + other
+        if not other is None:
+            lst_corr = [self] + other
 
         ###
         minY = None
