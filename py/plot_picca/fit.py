@@ -6,7 +6,6 @@ import copy
 import matplotlib.pyplot as plt
 import h5py
 import os.path
-import sys
 
 from . import utils
 from . import constants
