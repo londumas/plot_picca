@@ -6,6 +6,7 @@ import copy
 import matplotlib.pyplot as plt
 import h5py
 import os.path
+import sys
 
 from . import utils
 from . import constants
@@ -43,7 +44,7 @@ class Fit:
         for el in f['best fit'].attrs:
             if any( str(ell) in el for ell in lst_forFit):
                 if str(el)=='list of free pars' or str(el)=='list of fixed pars':
-                    self._fitAtrrs[str(el)]=[ ell.decode('UTF-8') for ell in f['best fit'].attrs[el]]
+                    self._fitAtrrs[str(el)]=sp.array([ ell for ell in f['best fit'].attrs[el]]).astype(str)
                 else:
                     self._fitAtrrs[str(el)]=f['best fit'].attrs[el]
             else:
@@ -59,6 +60,17 @@ class Fit:
         ### Set errors to zero for unfitted param
         for el in self._fitAtrrs['list of fixed pars']:
             self._param[el]['error'] = 0.
+
+        ### Convert from bias*f/beta to bias
+        #for p in list(self._param.keys()):
+        #    if len(p)>5 and p[:5]=='bias_':
+        #        if self._param['beta_'+p[5:]]['error']!=0. or self._param['growth_rate']['error']!=0.:
+        #            print("Can not correct bias measurement")
+        #            sys.exit()
+        #        coef = self._param['growth_rate']['value']/self._param['beta_'+p[5:]]['value']
+        #        self._param[p]['value'] *= coef
+        #        self._param[p]['error'] *= coef
+        #        print(p, self._param[p]['value'], self._param[p]['error'])
 
         ### Set proba
         self._fitAtrrs['proba'] = 1.-sp.stats.chi2.cdf(self._fitAtrrs['fval'],self._fitAtrrs['ndata']-self._fitAtrrs['npar'])

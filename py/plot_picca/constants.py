@@ -49,7 +49,7 @@ latex_name = {
     'drp'                : '\Delta r_{\parallel}',
     'growth_rate'        : 'f',
     'sigmaNL_per'        : '',
-    'sigma_velo_lorentz' : '',
+    'sigma_velo_lorentz' : '\sigma_{\mathrm{QSO}}',
     'bao_amp'            : 'A_{\\mathrm{BAO}}',
 
     'bias_LYA'           : '(b\\beta)_{\\mathrm{Ly\\alpha}}/f',
