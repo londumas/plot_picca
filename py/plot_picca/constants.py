@@ -44,6 +44,7 @@ latex_name = {
     'SigmaNL_perp'       : '\\sigma_{\\mathrm{NL},\\perp}',
     'ap'                 : '\\alpha_{\\parallel}',
     'at'                 : '\\alpha_{\\perp}',
+    'aiso'               : '\\alpha_{\\mathrm{iso.}}',
     'croom_par0'         : '',
     'croom_par1'         : '',
     'drp'                : '\Delta r_{\parallel}',

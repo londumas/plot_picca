@@ -205,8 +205,12 @@ class Fit:
             if len(p)>len('bias') and p[:4]=='bias':
                 val *= coeffBias
                 err *= coeffBias
-            val = utils.format_number_with_precision(val,err)
-            err = utils.format_number_with_precision(err,err)
+            if err==0.:
+                val = str(val)
+                err = str(err)
+            else:
+                val = utils.format_number_with_precision(val,err)
+                err = utils.format_number_with_precision(err,err)
             to_print += (math+val+pm+err+math).ljust(20)
             to_print += sep
 

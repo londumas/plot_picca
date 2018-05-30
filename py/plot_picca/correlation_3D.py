@@ -306,8 +306,9 @@ class Correlation3D:
         return
     def plot_slice_2d(self,sliceX=None,sliceY=None, other=None):
 
+        list_corr = [self]
         if not other is None:
-            list_corr = [self] + other
+            list_corr += other
 
         for el in list_corr:
             if (sliceX is not None):
@@ -343,8 +344,9 @@ class Correlation3D:
         return
     def plot_wedge(self,x_power=0,mumin=-1.,mumax=1., other=None):
 
+        list_corr = [self]
         if not other is None:
-            list_corr = [self] + other
+            list_corr += other
 
         for c in list_corr:
             rpmin = c._rp_min

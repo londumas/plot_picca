@@ -11,6 +11,11 @@ def croom(x):
     r = 0.53 + 0.289*(1.+x)**2
 
     return r
+def bias_vs_z_std(z, zref, alpha):
+
+    r = ((1.+z)/(1+zref))**alpha
+
+    return r
 def growthStructure(z, omega_M_0, unnormed=False):
 
     omega_m = 1./(1.+(1.-omega_M_0)/(omega_M_0*(1.+z)**3.))
