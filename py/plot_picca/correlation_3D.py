@@ -133,11 +133,12 @@ class Correlation3D:
 
         ### Correlation
         we  = vac[2]['WE'][:]
-        da  = vac[2]['DA'][:]
         self._we = we.sum(axis=0)
-        cut = (self._we>0.)
-        self._da       = (da*we).sum(axis=0)
-        self._da[cut] /= self._we[cut]
+        if self._correlation not in ['o_o','o1_o2']:
+            da  = vac[2]['DA'][:]
+            cut = (self._we>0.)
+            self._da       = (da*we).sum(axis=0)
+            self._da[cut] /= self._we[cut]
 
         vac.close()
 
@@ -377,7 +378,7 @@ class Correlation3D:
             plt.ylabel(r'$r \cdot \xi^{qf}(r) \, [h^{-1} \, \mathrm{Mpc}]$',fontsize=30)
         if (x_power==2):
             plt.ylabel(r'$r^{2} \cdot \xi^{qf}(r) \, [(h^{-1} \, \mathrm{Mpc})^{2}]$',fontsize=30)
-        plt.legend(fontsize=30, numpoints=1,ncol=2, loc=1)
+        plt.legend(fontsize=30, numpoints=1,ncol=2)
         plt.grid()
         plt.tight_layout()
         plt.show()

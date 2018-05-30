@@ -200,17 +200,25 @@ class Fit:
         to_print += math+ val +math+sep
 
         for p in lst:
-            val = self._param[p]['value']
-            err = self._param[p]['error']
-            if len(p)>len('bias') and p[:4]=='bias':
+
+            if p in self._param.keys():
+                val = self._param[p]['value']
+                err = self._param[p]['error']
+            else:
+                val = ''
+                err = 0.
+
+            if len(p)>len('bias') and p[:4]=='bias' and p in self._param.keys():
                 val *= coeffBias
                 err *= coeffBias
+
             if err==0.:
                 val = str(val)
                 err = str(err)
             else:
                 val = utils.format_number_with_precision(val,err)
                 err = utils.format_number_with_precision(err,err)
+
             to_print += (math+val+pm+err+math).ljust(20)
             to_print += sep
 
