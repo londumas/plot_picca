@@ -175,10 +175,11 @@ class Correlation3D_angl:
         plt.show()
 
         return
-    def plot_slice_2d(self,sliceX=None,sliceY=None, other=[],coefX=1.):
+    def plot_slice_2d(self,sliceX=None,sliceY=None, other=None,coefX=1.):
 
         crt = 1./scipy.constants.degree
-        list_corr = [self] + other
+        if not other is None:
+            list_corr = [self] + other
 
         for el in list_corr:
 
