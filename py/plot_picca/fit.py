@@ -193,10 +193,11 @@ class Fit:
         ###
         value = self.fastmc[par]['errors']
         error_data = self._param[par]['error']
-        plt.hist(value,bins=10)
-        plt.plot([error_data,error_data],[0.,value.size], color='red',linewidth=4)
-        plt.xlabel(r'$\sigma( \, '+self._param[par]['name']+')$',fontsize=20)
-        plt.ylabel(r'$\#$',fontsize=20)
+        plt.hist(value,bins=10, histtype='step', label=r'$\mathrm{'+self._title+'}$',color='blue')
+        plt.plot([error_data,error_data],[0.,value.size],'--', color='blue',linewidth=2)
+        plt.xlabel(r'$\sigma('+self._param[par]['name']+')$',fontsize=30)
+        plt.ylabel(r'$\#$',fontsize=30)
+        plt.legend(fontsize=30)
         plt.grid()
         plt.show()
 
