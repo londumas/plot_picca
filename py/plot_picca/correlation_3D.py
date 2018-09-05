@@ -206,14 +206,12 @@ class Correlation3D:
         return
     def covariance_is_valid(self):
 
-        valid = True
-        ### Covariance matrix
         try:
             sp.linalg.cholesky(self._co)
         except:
             return False
 
-        return valid
+        return True
     def plot_2d(self,x_power=0):
 
         if ((self._we>0.).sum()==0):
@@ -323,9 +321,9 @@ class Correlation3D:
                 yer = el._er[cut]
 
             if el._er is None:
-                plt.errorbar(xxx,yyy,linewidth=4,label=r'$'+el._title+'$')
+                plt.errorbar(xxx,yyy,linewidth=4,label=r'$'+el._title+'$',color='red')
             else:
-                plt.errorbar(xxx,yyy,yerr=yer,linewidth=4,label=r'$'+el._title+'$')
+                plt.errorbar(xxx,yyy,yerr=yer,linewidth=4,label=r'$'+el._title+'$',color='black')
 
         if (sliceX is not None):
             minX = el._rt_min+el._binSizeT*sliceX
@@ -338,7 +336,7 @@ class Correlation3D:
             plt.title(r"$"+str(minY)+" < r_{\parallel} < "+str(maxY)+"$",fontsize=30)
             plt.xlabel(r'$r_{\perp} \, [h^{-1} \, \mathrm{Mpc}]$',fontsize=30)
         plt.ylabel(r'$\xi^{qf}(r_{\parallel},r_{\perp})$',fontsize=30)
-        #plt.legend(fontsize=30, numpoints=1,ncol=2, loc=1)
+        plt.legend(fontsize=30, numpoints=1,ncol=2, loc=1)
         plt.grid()
         plt.show()
 
@@ -366,9 +364,9 @@ class Correlation3D:
             e = sp.sqrt(sp.diag(ivar))
             coef = sp.power(r,x_power)
             if not c._isfit:
-                plt.errorbar(r,coef*d,yerr=coef*e,linewidth=4,label=r'$'+c._title+'$')
+                plt.errorbar(r,coef*d,yerr=coef*e,linewidth=4,label=r'$'+c._title+'$',color='black')
             else:
-                plt.errorbar(r,coef*d,linewidth=4,label=r'$'+c._title+'$')
+                plt.errorbar(r,coef*d,linewidth=4,label=r'$'+c._title+'$',color='red')
 
         plt.title(r"$"+str(mumin)+" < \mu < "+str(mumax)+"$",fontsize=30)
         plt.xlabel(r'$r \, [h^{-1} \, \mathrm{Mpc}]$',fontsize=30)
@@ -404,10 +402,10 @@ class Correlation3D:
         if True:
             cor = utils.getCorrelationMatrix(cov)
             ###
-            tcor = cor.copy()
-            tcor[tcor==1.] = sp.nan
-            plt.imshow(tcor, interpolation='nearest')
-            plt.show()
+            #tcor = cor.copy()
+            #tcor[tcor==1.] = sp.nan
+            #plt.imshow(tcor, interpolation='nearest')
+            #plt.show()
             ###
             yMin = None
             yMax = None

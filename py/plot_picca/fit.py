@@ -47,14 +47,13 @@ class Fit:
                 else:
                     self._fitAtrrs[str(el)]=f['best fit'].attrs[el]
             else:
-                dic = {}
-                dic['value'] = f['best fit'].attrs[el][0]
-                dic['error'] = f['best fit'].attrs[el][1]
+                self._param[str(el)] = {}
+                self._param[str(el)]['value'] = f['best fit'].attrs[el][0]
+                self._param[str(el)]['error'] = f['best fit'].attrs[el][1]
                 if str(el) in list(constants.latex_name.keys()):
-                    dic['name'] = constants.latex_name[str(el)]
+                    self._param[str(el)]['name'] = constants.latex_name[str(el)]
                 else:
-                    dic['name'] = str(el)
-                self._param[str(el)] = dic
+                    self._param[str(el)]['name'] = str(el)
 
         ### Set errors to zero for unfitted param
         for el in self._fitAtrrs['list of fixed pars']:
@@ -111,10 +110,31 @@ class Fit:
                         self.chi2scan_result['parameters'][str(item)] = value
                     self.chi2scan_result['values'] = f['chi2 scan']['result']['values'].value
 
+        ### fast mc
+        if 'fast mc' in [ el for el in list(f.keys())]:
+            self.fastmc = {}
+            self.fastmc['niterations'] = f['fast mc'].attrs['niterations']
+            self.fastmc['seed'] = f['fast mc'].attrs['seed']
+            self.fastmc['covscaling'] = f['fast mc'].attrs['covscaling']
+            self.fastmc['chi2'] = f['fast mc/chi2'].value
+            for p in self._param:
+                strp = str(p)
+                self.fastmc[strp] = {}
+                self.fastmc[strp]['values'] = f['fast mc/'+p+'/values'].value
+                self.fastmc[strp]['errors'] = f['fast mc/'+p+'/errors'].value
+                self.fastmc[strp]['expected'] = self._param[strp]['value']
+                self.fastmc[strp]['fixed'] = strp in self._fitAtrrs['list of fixed pars']
+                if self.fastmc[strp]['fixed']:
+                    self.fastmc[strp]['errors'][:] = 0.
+            for p in f['fast mc'].attrs['list of fiducial pars']:
+                self.fastmc[str(p)]['expected'] = float(f['fast mc'].attrs['fiducial['+p+']'][0])
+                self.fastmc[str(p)]['fixed'] = f['fast mc'].attrs['fiducial['+p+']'][1]=='fixed'
+                if self.fastmc[str(p)]['fixed']:
+                    self.fastmc[str(p)]['errors'][:] = 0.
         f.close()
 
         return
-    def plot_chi2scan(self,deltachi2=True):
+    def plot_chi2scan(self,deltachi2=True,sigmas=True):
 
         if deltachi2:
             zlabel = '\Delta \chi^{2}'
@@ -133,9 +153,12 @@ class Fit:
                 zzz -= self._fitAtrrs['fval']
 
             plt.plot(xxx,zzz,linewidth=4)
-            plt.grid()
+            if sigmas:
+                for i in range(1,4):
+                    plt.plot(xxx,i**2*sp.ones(xxx.size),'--',linewidth=4,color='grey')
             plt.xlabel(r'$'+constants.latex_name[par]+'$',fontsize=30)
             plt.ylabel(r'$'+zlabel+'$',fontsize=30)
+            plt.grid()
             plt.show()
         elif dim==2:
             par1 = self.chi2scan.keys()[0]
@@ -157,6 +180,67 @@ class Fit:
             cbar.formatter.set_powerlimits((0, 0))
             cbar.update_ticks()
             plt.show()
+
+        return
+    def plot_fastMC(self, par):
+
+        ###
+        if par=='chi2':
+            value = self.fastmc['chi2']
+            errors = sp.zeros(value.size)
+            expected = self._fitAtrrs['ndata']-self._fitAtrrs['npar']
+            pull = sp.zeros(value.size)
+            data = self._fitAtrrs['fval']
+            error_data = sp.zeros(value.size)
+            pull_data = sp.zeros(value.size)
+            name = '\\chi^{2}'
+        else:
+            value = self.fastmc[par]['values']
+            errors = self.fastmc[par]['errors']
+            expected = float(self.fastmc[par]['expected'])
+            pull = (value-expected)/errors
+            data = self._param[par]['value']
+            error_data = self._param[par]['error']
+            pull_data = (data-expected)/error_data
+            name = self._param[par]['name']
+
+        ###
+        print(' parameter = ', name)
+        print(' expected  = ', expected)
+        print(' mean      = ', value.mean() )
+        print(' variance  = ', value.var(ddof=1) )
+        print(' error     = ', value.var()/sp.sqrt(value.size-1) )
+        print(' var with respect to expected = ', sp.sqrt( sp.mean((value-expected)**2 )) )
+        print(' mean pull      = ', pull.mean() )
+        print(' variance pull  = ', pull.var(ddof=1) )
+
+        ### histo value
+        plt.hist(value,bins=10)
+        plt.plot([expected,expected],[0.,value.size], color='red',linewidth=4)
+        plt.plot([data,data],[0.,value.size],'--', color='black',linewidth=4)
+        plt.xlabel(r'$'+name+'$',fontsize=20)
+        plt.ylabel(r'$\#$',fontsize=20)
+        plt.grid()
+        plt.show()
+
+        ### histo pull
+        plt.hist(pull,bins=10)
+        plt.plot([0.,0.],[0.,value.size], color='red',linewidth=4)
+        plt.plot([pull_data,pull_data],[0.,value.size],'--', color='black',linewidth=4)
+        plt.xlabel(r'$('+name+'-exp)/err$',fontsize=20)
+        plt.ylabel(r'$\#$',fontsize=20)
+        plt.grid()
+        plt.show()
+
+        ### histo error
+        plt.hist(errors,bins=10, histtype='step', label=r'$\mathrm{'+self._title+'}$',color='blue')
+        plt.plot([errors.mean(),errors.mean()],[0.,value.size],'--', color='blue',linewidth=2)
+        plt.plot([error_data,error_data],[0.,value.size],'--', color='black',linewidth=2,label=r'$\mathrm{Data}$')
+        plt.xlabel(r'$\sigma('+name+')$',fontsize=40)
+        plt.ylabel(r'$\#$',fontsize=40)
+        plt.legend(fontsize=40)
+        plt.grid()
+        plt.show()
 
         return
     def print_fitted_par(self,lst=None,coeffBias=1.,header=True,latex=False,redshift=False):
