@@ -213,7 +213,7 @@ class Correlation1D:
         plt.ylabel(r'$\xi^{1D}(\lambda_{1}/\lambda_{2})/\sqrt{\xi^{1D}(\lambda_{1})\xi^{1D}(\lambda_{2})}$',fontsize=30)
         plt.legend(fontsize=20, numpoints=1,ncol=2, loc=1)
         plt.grid()
-        plt.tight_layout()
+        #plt.tight_layout()
         #plt.savefig("fig.png")
         #plt.clf()
         plt.show()
