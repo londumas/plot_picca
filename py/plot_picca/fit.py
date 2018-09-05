@@ -116,6 +116,7 @@ class Fit:
             self.fastmc['niterations'] = f['fast mc'].attrs['niterations']
             self.fastmc['seed'] = f['fast mc'].attrs['seed']
             self.fastmc['covscaling'] = f['fast mc'].attrs['covscaling']
+            self.fastmc['chi2'] = f['fast mc/chi2'].value
             for p in self._param:
                 strp = str(p)
                 self.fastmc[strp] = {}
@@ -123,10 +124,13 @@ class Fit:
                 self.fastmc[strp]['errors'] = f['fast mc/'+p+'/errors'].value
                 self.fastmc[strp]['expected'] = self._param[strp]['value']
                 self.fastmc[strp]['fixed'] = strp in self._fitAtrrs['list of fixed pars']
+                if self.fastmc[strp]['fixed']:
+                    self.fastmc[strp]['errors'][:] = 0.
             for p in f['fast mc'].attrs['list of fiducial pars']:
-                self.fastmc[str(p)]['expected'] = f['fast mc'].attrs['fiducial['+p+']'][0]
+                self.fastmc[str(p)]['expected'] = float(f['fast mc'].attrs['fiducial['+p+']'][0])
                 self.fastmc[str(p)]['fixed'] = f['fast mc'].attrs['fiducial['+p+']'][1]=='fixed'
-
+                if self.fastmc[str(p)]['fixed']:
+                    self.fastmc[str(p)]['errors'][:] = 0.
         f.close()
 
         return
@@ -181,23 +185,60 @@ class Fit:
     def plot_fastMC(self, par):
 
         ###
-        value = self.fastmc[par]['values']
-        expected = self.fastmc[par]['expected']
+        if par=='chi2':
+            value = self.fastmc['chi2']
+            errors = sp.zeros(value.size)
+            expected = self._fitAtrrs['ndata']-self._fitAtrrs['npar']
+            pull = sp.zeros(value.size)
+            data = self._fitAtrrs['fval']
+            error_data = sp.zeros(value.size)
+            pull_data = sp.zeros(value.size)
+            name = '\\chi^{2}'
+        else:
+            value = self.fastmc[par]['values']
+            errors = self.fastmc[par]['errors']
+            expected = float(self.fastmc[par]['expected'])
+            pull = (value-expected)/errors
+            data = self._param[par]['value']
+            error_data = self._param[par]['error']
+            pull_data = (data-expected)/error_data
+            name = self._param[par]['name']
+
+        ###
+        print(' parameter = ', name)
+        print(' expected  = ', expected)
+        print(' mean      = ', value.mean() )
+        print(' variance  = ', value.var(ddof=1) )
+        print(' error     = ', value.var()/sp.sqrt(value.size-1) )
+        print(' var with respect to expected = ', sp.sqrt( sp.mean((value-expected)**2 )) )
+        print(' mean pull      = ', pull.mean() )
+        print(' variance pull  = ', pull.var(ddof=1) )
+
+        ### histo value
         plt.hist(value,bins=10)
         plt.plot([expected,expected],[0.,value.size], color='red',linewidth=4)
-        plt.xlabel(r'$'+self._param[par]['name']+'$',fontsize=20)
+        plt.plot([data,data],[0.,value.size],'--', color='black',linewidth=4)
+        plt.xlabel(r'$'+name+'$',fontsize=20)
         plt.ylabel(r'$\#$',fontsize=20)
         plt.grid()
         plt.show()
 
-        ###
-        value = self.fastmc[par]['errors']
-        error_data = self._param[par]['error']
-        plt.hist(value,bins=10, histtype='step', label=r'$\mathrm{'+self._title+'}$',color='blue')
-        plt.plot([error_data,error_data],[0.,value.size],'--', color='blue',linewidth=2)
-        plt.xlabel(r'$\sigma('+self._param[par]['name']+')$',fontsize=30)
-        plt.ylabel(r'$\#$',fontsize=30)
-        plt.legend(fontsize=30)
+        ### histo pull
+        plt.hist(pull,bins=10)
+        plt.plot([0.,0.],[0.,value.size], color='red',linewidth=4)
+        plt.plot([pull_data,pull_data],[0.,value.size],'--', color='black',linewidth=4)
+        plt.xlabel(r'$('+name+'-exp)/err$',fontsize=20)
+        plt.ylabel(r'$\#$',fontsize=20)
+        plt.grid()
+        plt.show()
+
+        ### histo error
+        plt.hist(errors,bins=10, histtype='step', label=r'$\mathrm{'+self._title+'}$',color='blue')
+        plt.plot([errors.mean(),errors.mean()],[0.,value.size],'--', color='blue',linewidth=2)
+        plt.plot([error_data,error_data],[0.,value.size],'--', color='black',linewidth=2,label=r'$\mathrm{Data}$')
+        plt.xlabel(r'$\sigma('+name+')$',fontsize=40)
+        plt.ylabel(r'$\#$',fontsize=40)
+        plt.legend(fontsize=40)
         plt.grid()
         plt.show()
 
